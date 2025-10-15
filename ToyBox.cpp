@@ -1,4 +1,4 @@
-#include "Parser.hpp"
+#include "Lexer.hpp"
 #include <fstream>
 #include <iostream>
 #include <regex>
@@ -15,15 +15,13 @@ int main(int argc, char *argv[]) {
     // std::cin >> fileName;
     fin.open(fileName);
   }
-  Parser parser;
+  Lexer tokenizer;
 
   std::string line;
   while (std::getline(fin, line)) {
-    parser.Tokenize(line);
+    tokenizer.Tokenize(line);
   }
-  parser.PrintTokens();
-  parser.ParseTokens();
-  parser.PrintStatements();
+  tokenizer.PrintTokens();
 
   fin.close();
 
