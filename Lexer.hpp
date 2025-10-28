@@ -1,69 +1,64 @@
 #pragma once
 
 #include "Types.hpp"
+#include <cmath>
 #include <iostream>
 #include <regex>
+#include <cctype>
 
 // All tokens with their names and respective patterns
-const TokenType TYPE{"Type", R"(^int\b)"},
-    IDENTIFIER{"Identifier", R"(^[a-z]\b)"},
-    LINE_DELIMITER{"Line Delimiter", R"(^;)"},
-    KEY_WORD{"Key Word", R"(^[A-Za-z]+)"}, EQUALS{"Equals", R"(^=(?!=))"},
-    EXPRESSION{"Expression", R"(^\b\d+\b)"}, WHILE{"While", R"(^while\b)"},
-    IF{"If", R"(^if\b)"}, OPEN_PARENTHESIS{"Open Parenthesis", "^("},
-    CLOSE_PARENTHESIS{"Close Parenthesis", "^)"},
-    OPEN_CURLY{"Open Curly Brace", "^{"},
-    CLOSE_CURLY{"Close Curly Brace", "^}"};
-// List of all known tokens
+const TokenType
+    IDENTIFIER{"Identifier", std::regex("^[a-z]+", std::regex::icase)},
+    OPEN_PARENTHESIS{"Open Parenthesis", std::regex("^\\(")},
+    CLOSE_PARENTHESIS{"Close Parenthesis", std::regex("^\\)")},
+    COMMA{"Comma", std::regex("^,")},
+    PERIOD{"Comma", std::regex("^.")},
+    AXES{"Comma", std::regex("^[xyzwrgbastpquv]{1,4}", std::regex::icase)},
+    ERROR{"UNKNOWN SYMBOL", std::regex("\\b\\B")};
+
+// List of tokens which are checked against
 const TokenType TokenTypes[] = {
-    TYPE,
     IDENTIFIER,
-    LINE_DELIMITER,
-    KEY_WORD,
-    EQUALS,
-    EXPRESSION,
-    WHILE,
-    IF,
     OPEN_PARENTHESIS,
     CLOSE_PARENTHESIS,
-    OPEN_CURLY,
-    CLOSE_CURLY,
+    COMMA,
+    PERIOD,
+    AXES,
+    ERROR,
 };
 
 class Lexer {
-protected:
-  std::deque<Token> tokens;
+  std::string file;
 
 public:
-  static void PrintToken(const Token &t) {
-    std::cout << t.name << ": " << t.value << '\n';
-  }
-  static void PrintSymbol(const SymbolType &t) { std::cout << t.name << '\n'; }
+  Lexer() { }
+  Lexer(std::string str) : file(str) { }
 
-  void Tokenize(std::string str) {
-    DEBUG("Tokenizing: ", str);
-
+  Token GetNext(std::string& str) {
     std::smatch match;
-    while (str.length() > 0) {
-      while (str.length() > 0 && str[0] == ' ')
-        str = str.substr(1);
-      DEBUG("Current string: ", str);
-      for (TokenType tt : TokenTypes) {
-        if (std::regex_search(str, match, std::regex(tt.pattern))) {
-          tokens.push_back({tt, match[0].str()});
-          str = str.substr(match.position() + match.length());
-          DEBUG("Found: ", tt.name);
-          break;
-        }
+    if (str.length() == 0) return {ERROR, "Empty String"};
+
+    while (str.length() > 0 && str[0] == ' ')
+      str = str.substr(1);
+
+    DEBUG("Current string: ", str);
+    for (TokenType tt : TokenTypes) {
+      if (std::regex_search(str, match, tt.pattern)) {
+        std::string found = match[0].str();        
+        str = str.substr(found.length());
+        DEBUG("Found: ", tt.name);
+        std::transform(found.begin(), found.end(), found.begin(), ::tolower);
+        return {tt, found};
       }
     }
+    return {ERROR, str};
   }
 
-  void PrintTokens() {
-    std::cout << "Symbols: {\n";
-    for (Token s : tokens) {
-      PrintToken(s);
-    }
-    std::cout << "}\n";
+  Token GetNext() {
+    return GetNext(file);
+  }
+
+  bool Done() {
+    return file.length() == 0;
   }
 };

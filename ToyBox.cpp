@@ -1,6 +1,7 @@
-#include "Lexer.hpp"
+#include "Parser.hpp"
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <regex>
 #include <string>
 
@@ -12,18 +13,17 @@ int main(int argc, char *argv[]) {
   } else {
     std::cout << "Enter file name: ";
     std::string fileName = "first.tb"; // fix on release
-    // std::cin >> fileName;
+    std::cin >> fileName;
     fin.open(fileName);
   }
-  Lexer tokenizer;
-
-  std::string line;
-  while (std::getline(fin, line)) {
-    tokenizer.Tokenize(line);
-  }
-  tokenizer.PrintTokens();
-
+  
+  std::stringstream buffer;
+  buffer<<fin.rdbuf();
   fin.close();
+  Parser parser;
+
+  parser.Parse(buffer.str());
+  parser.GenerateGLSL("out.html");
 
   return 0;
 }

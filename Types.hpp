@@ -2,35 +2,29 @@
 #include <vector>
 #include <string>
 #include <deque>
+#include <regex>
+#include <iostream>
 
-// #define DEBUG(MSG, VALUE) std::cout << (MSG) << (VALUE) << std::endl
-#define DEBUG(MSG, VALUE)
+#define DEBUG(MSG, VALUE) std::cout << (MSG) << (VALUE) << std::endl
+// #define DEBUG(MSG, VALUE)
 
-// patterns
-struct SymbolType;
 struct TokenType;
-struct StatementType;
-// actual values
 struct Token;
-struct Statement;
-// a symbol can be a token (terminal) or a symbol (token or statement)
-typedef std::vector<SymbolType> SymbolSequence;
 
-struct SymbolType { //Everything is a symbol
+struct TokenType { //A token is a symbol which can be resolved using a (regex) pattern
 	std::string name;
+	std::regex pattern;
+	bool operator==(const TokenType& other) const {
+		return name == other.name;
+	}
+	bool operator!=(const TokenType& other) const {
+		return name != other.name;
+	}
 };
-
-struct TokenType : SymbolType { //A token is a symbol which can be resolved using a (regex) pattern
-	std::string pattern;
-};
-struct StatementType : SymbolType { //A Statement is a symbol which requires a pattern of symbols
-	// List of (List of symbols (pattern)) (possible patterns)
-	std::vector<SymbolSequence> Sequences;
-};
-
-struct Token : TokenType {
+struct Token {
+	const TokenType type;
 	std::string value;
-};
-struct Statement : StatementType{
-	std::deque<SymbolType> Sequence;
+	void Print() {
+		std::cout << type.name << ": " << value << '\n';
+	}
 };
