@@ -51,6 +51,36 @@ public:
                 return false;
             toy->AddChild(fract);
             return true;
+        } else if (next.value == "sin") {
+            if (lex.GetNext(str).type != OPEN_PARENTHESIS)
+                return false;
+            Toy* sin = new Sin();
+            if (!ParseToy(str, sin))
+                return false;
+            if (lex.GetNext(str).type != CLOSE_PARENTHESIS)
+                return false;
+            toy->AddChild(sin);
+            return true;
+        } else if (next.value == "cos") {
+            if (lex.GetNext(str).type != OPEN_PARENTHESIS)
+                return false;
+            Toy* cos = new Cos();
+            if (!ParseToy(str, cos))
+                return false;
+            if (lex.GetNext(str).type != CLOSE_PARENTHESIS)
+                return false;
+            toy->AddChild(cos);
+            return true;
+        } else if (next.value == "tan") {
+            if (lex.GetNext(str).type != OPEN_PARENTHESIS)
+                return false;
+            Toy* tan = new Tan();
+            if (!ParseToy(str, tan))
+                return false;
+            if (lex.GetNext(str).type != CLOSE_PARENTHESIS)
+                return false;
+            toy->AddChild(tan);
+            return true;
         } else if (next.value == "mult" || next.value == "multiply") {
             if (lex.GetNext(str).type != OPEN_PARENTHESIS)
                 return false;

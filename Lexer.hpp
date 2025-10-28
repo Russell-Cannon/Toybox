@@ -13,7 +13,7 @@ const TokenType
     CLOSE_PARENTHESIS{"Close Parenthesis", std::regex("^\\)")},
     COMMA{"Comma", std::regex("^,")},
     PERIOD{"Period", std::regex("^\\.")},
-    NUMBER{"Number", std::regex("^[-+]?[0-9\\.]+[fd]?", std::regex::icase)},
+    NUMBER{"Number", std::regex("^-?[0-9\\.]+[fd]?", std::regex::icase)},
     AXES{"Axis", std::regex("^[xyzwrgbastpquv]{1,4}", std::regex::icase)},
     ERROR{"UNKNOWN SYMBOL", std::regex("\\b\\B")};
 

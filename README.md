@@ -1,22 +1,27 @@
-#BNF
+Quilt for shaders. Derivative but deeper AND wider
 
-```bnf
-<statement> ::=   "if" "(" <expression> ")" <statement>
-		| "if" "(" <expression> ")" <statement> "else" <statement>
-		| "while" "(" <expression> ")" <statement>
-		| "{" <statement list> "}"
-		| <type> <identifier> ";"
-		| <type> <identifier> "=" <expression> ";"
-		| <identifier> "=" <expression> ";"
+Distance fields for basic shapes: line, circle, rectangle, square(rectangle named alternative), screen (named rectangle alternative), triangle
 
-<statement list> ::=
-		| <statement>
-		| <statement> <statement list>
+Linear mathematical operations: divide, add, subtract, modulus, floor, ceil, round, negate
+-support these by symbol (stretch)
 
-<type> ::= "int"
+//Trig operations: sin, cos, tan
 
-<identifier> ::=  "A" | "B" | "C" | ... | "Z"
-		| "a" | "b" | "c" | ... | "z"
+GL operations: lerp, mix, step, smooth step, clamp
 
-<expression> ::= //the example from class.
-```
+Vector math operations: dot, cross, normalize, length, distance, direction 
+
+A default texture just named texture 
+Other textures can specified in the variables section by referencing a file path
+
+Average function which can take any number of children (1- infinity)
+
+Shorthand for useful functions: sobel, gaussian, noise, 
+
+Swizzling
+-impossible?
+-Could make a function which returns the vector times 0 in all but the axis desired
+
+Also: 
+some way to record or screenshot the page in browser (stretch)
+
