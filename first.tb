@@ -1,1 +1,1 @@
-fract(time)
+fract(mult(uv, 4))

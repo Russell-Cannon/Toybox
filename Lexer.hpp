@@ -12,8 +12,9 @@ const TokenType
     OPEN_PARENTHESIS{"Open Parenthesis", std::regex("^\\(")},
     CLOSE_PARENTHESIS{"Close Parenthesis", std::regex("^\\)")},
     COMMA{"Comma", std::regex("^,")},
-    PERIOD{"Comma", std::regex("^.")},
-    AXES{"Comma", std::regex("^[xyzwrgbastpquv]{1,4}", std::regex::icase)},
+    PERIOD{"Period", std::regex("^\\.")},
+    NUMBER{"Number", std::regex("^[-+]?[0-9\\.]+[fd]?", std::regex::icase)},
+    AXES{"Axis", std::regex("^[xyzwrgbastpquv]{1,4}", std::regex::icase)},
     ERROR{"UNKNOWN SYMBOL", std::regex("\\b\\B")};
 
 // List of tokens which are checked against
@@ -23,6 +24,7 @@ const TokenType TokenTypes[] = {
     CLOSE_PARENTHESIS,
     COMMA,
     PERIOD,
+    NUMBER,
     AXES,
     ERROR,
 };
@@ -51,6 +53,7 @@ public:
         return {tt, found};
       }
     }
+    std::cerr << "UNKNOWN CHARACTER: in '" << str << "'\n";
     return {ERROR, str};
   }
 
