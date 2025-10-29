@@ -7,4 +7,5 @@ run:	ToyBox.exe
 clean:
 	del *.exe *.html
 
-do:	ToyBox.exe	run
+see:	ToyBox.exe
+	./out.html

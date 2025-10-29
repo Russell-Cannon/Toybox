@@ -31,11 +31,11 @@ public:
     postamble.close();
   }
 
-    template<typename t> bool ParseUnaryOperation(std::string& str, Toy* toy) {
+    template<typename ToyType> bool ParseUnaryOperation(std::string& str, Toy* toy) {
         Lexer lex;
         if (lex.GetNext(str).type != OPEN_PARENTHESIS)
             return false;
-        Toy* typedToy = new t();
+        Toy* typedToy = new ToyType();
         if (!ParseToy(str, typedToy))
             return false;
         if (lex.GetNext(str).type != CLOSE_PARENTHESIS)
@@ -44,12 +44,36 @@ public:
         return true;
     }
 
-    template<typename t> bool ParseBinaryOperation(std::string& str, Toy* toy) {
+    template<typename ToyType> bool ParseBinaryOperation(std::string& str, Toy* toy) {
         Lexer lex;
         if (lex.GetNext(str).type != OPEN_PARENTHESIS)
             return false;
 
-        Toy* typedToy = new t();
+        Toy* typedToy = new ToyType();
+        if (!ParseToy(str, typedToy))
+            return false;
+        if (lex.GetNext(str).type != COMMA)
+            return false;
+        if (!ParseToy(str, typedToy))
+            return false;
+
+        if (lex.GetNext(str).type != CLOSE_PARENTHESIS)
+            return false;
+
+        toy->AddChild(typedToy);
+        return true;
+    }
+
+    template<typename ToyType> bool ParseTrinaryOperation(std::string& str, Toy* toy) {
+        Lexer lex;
+        if (lex.GetNext(str).type != OPEN_PARENTHESIS)
+            return false;
+
+        Toy* typedToy = new ToyType();
+        if (!ParseToy(str, typedToy))
+            return false;
+        if (lex.GetNext(str).type != COMMA)
+            return false;
         if (!ParseToy(str, typedToy))
             return false;
         if (lex.GetNext(str).type != COMMA)
@@ -102,6 +126,8 @@ public:
             return ParseBinaryOperation<Subtract>(str, toy);
         } else if (next.value == "mod" || next.value == "modulus" || next.value == "modulo") {
             return ParseBinaryOperation<Modulus>(str, toy);
+        } else if (next.value == "com" || next.value == "comb" || next.value == "combine") {
+            return ParseTrinaryOperation<Combine>(str, toy);
         }
     } else if (next.type == NUMBER) {
         float number = std::atof(next.value.c_str());

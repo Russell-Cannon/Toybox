@@ -185,6 +185,25 @@ class Modulus : public Toy {
         return "mod(" + children[0]->GenerateGLSL() + ", " + children[1]->GenerateGLSL() + ")";
     }
 };
+////Trinary
+class Combine : public Toy {
+    std::string GenerateGLSL() {
+        if (children.empty()) {
+            std::cerr << "Combine generated with no children\n";
+            AddChild(new LitError());
+            AddChild(new LitError());
+            AddChild(new LitError());
+        } else if (children.size() == 2) {
+            std::cerr << "Combine generated only two children\n";
+            AddChild(new LitError());
+        } else if (children.size() == 1) {
+            std::cerr << "Combine generated with only one child\n";
+            AddChild(new LitError());
+            AddChild(new LitError());
+        }
+        return "vec3(" + children[0]->GenerateGLSL() + ".x, " + children[1]->GenerateGLSL() + ".y, " + children[2]->GenerateGLSL() + ".z)";
+    }
+};
 
 class Document : public Toy {
 public: 

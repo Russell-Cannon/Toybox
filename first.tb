@@ -1,1 +1,1 @@
-text(negate(uv))
+combine(uv, uv, 1)
