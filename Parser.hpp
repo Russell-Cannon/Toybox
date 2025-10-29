@@ -74,7 +74,7 @@ public:
         } else if (next.value == "time") {
             toy->AddChild(new LitTime());
             return true;
-        } else if (next.value == "fract" || next.value == "fraction" || next.value == "remainder") {
+        } else if (next.value == "frac" || next.value == "fract" || next.value == "fraction" || next.value == "remainder") {
             return ParseUnaryOperation<Fract>(str, toy);
         } else if (next.value == "sin") {
             return ParseUnaryOperation<Sin>(str, toy);
@@ -82,9 +82,17 @@ public:
             return ParseUnaryOperation<Cos>(str, toy);
         } else if (next.value == "tan") {
             return ParseUnaryOperation<Tan>(str, toy);
-        } else if (next.value == "texture" || next.value == "text") {
+        } else if (next.value == "text" || next.value == "texture") {
             return ParseUnaryOperation<Texture>(str, toy);
-        } else if (next.value == "mult" || next.value == "multiply") {
+        } else if (next.value == "ceil" || next.value == "ceiling") {
+            return ParseUnaryOperation<Ceiling>(str, toy);
+        } else if (next.value == "floor") {
+            return ParseUnaryOperation<Floor>(str, toy);
+        } else if (next.value == "round") {
+            return ParseUnaryOperation<Round>(str, toy);
+        } else if (next.value == "neg" || next.value == "negate") {
+            return ParseUnaryOperation<Negate>(str, toy);
+        } else if (next.value == "mul" || next.value == "mult" || next.value == "multiply") {
             return ParseBinaryOperation<Multiply>(str, toy);
         } else if (next.value == "div" || next.value == "divide") {
             return ParseBinaryOperation<Divide>(str, toy);
@@ -92,6 +100,8 @@ public:
             return ParseBinaryOperation<Add>(str, toy);
         } else if (next.value == "sub" || next.value == "subtract") {
             return ParseBinaryOperation<Subtract>(str, toy);
+        } else if (next.value == "mod" || next.value == "modulus" || next.value == "modulo") {
+            return ParseBinaryOperation<Modulus>(str, toy);
         }
     } else if (next.type == NUMBER) {
         float number = std::atof(next.value.c_str());

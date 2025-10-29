@@ -2,16 +2,16 @@ Quilt for shaders. Derivative but deeper AND wider
 
 Distance fields for basic shapes: line, circle, rectangle, square(rectangle named alternative), screen (named rectangle alternative), triangle
 
-Linear mathematical operations: divide, add, subtract, modulus, floor, ceil, round, negate
+/Linear mathematical operations: divide, add, subtract, modulus, floor, ceil, round, negate
 -support these by symbol (stretch)
 
-//Trig operations: sin, cos, tan
+/Trig operations: sin, cos, tan
 
 GL operations: lerp, mix, step, smooth step, clamp
 
 Vector math operations: dot, cross, normalize, length, distance, direction 
 
-A default texture just named texture 
+/A default texture just named texture 
 Other textures can specified in the variables section by referencing a file path
 
 Average function which can take any number of children (1- infinity)

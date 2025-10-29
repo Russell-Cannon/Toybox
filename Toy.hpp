@@ -82,6 +82,42 @@ class Texture : public Toy {
         return "texture(u_texture, vec2(" + childOutput + ".x, -" + childOutput + ".y)).xyz";
     }
 };
+class Ceiling : public Toy {
+    std::string GenerateGLSL() {
+        if (children.empty()) {
+            std::cerr << "Ceiling generated with no children\n";
+            AddChild(new LitError());
+        }
+        return "ceil(" + children[0]->GenerateGLSL() + ")";
+    }
+};
+class Floor : public Toy {
+    std::string GenerateGLSL() {
+        if (children.empty()) {
+            std::cerr << "Floor generated with no children\n";
+            AddChild(new LitError());
+        }
+        return "floor(" + children[0]->GenerateGLSL() + ")";
+    }
+};
+class Round : public Toy {
+    std::string GenerateGLSL() {
+        if (children.empty()) {
+            std::cerr << "Round generated with no children\n";
+            AddChild(new LitError());
+        }
+        return "round(" + children[0]->GenerateGLSL() + ")";
+    }
+};
+class Negate : public Toy {
+    std::string GenerateGLSL() {
+        if (children.empty()) {
+            std::cerr << "Negate generated with no children\n";
+            AddChild(new LitError());
+        }
+        return "(-" + children[0]->GenerateGLSL() + ")";
+    }
+};
 
 ////Binary
 class Multiply : public Toy {
@@ -133,7 +169,20 @@ class Subtract : public Toy {
             std::cerr << "Subtract generated with only one child\n";
             AddChild(new LitError());
         }
-        return "(" + children[0]->GenerateGLSL() + " - "+children[1]->GenerateGLSL() + ")";
+        return "(" + children[0]->GenerateGLSL() + " - " + children[1]->GenerateGLSL() + ")";
+    }
+};
+class Modulus : public Toy {
+    std::string GenerateGLSL() {
+        if (children.empty()) {
+            std::cerr << "Modulus generated with no children\n";
+            AddChild(new LitError());
+            AddChild(new LitError());
+        } else if (children.size() == 1) {
+            std::cerr << "Modulus generated with only one child\n";
+            AddChild(new LitError());
+        }
+        return "mod(" + children[0]->GenerateGLSL() + ", " + children[1]->GenerateGLSL() + ")";
     }
 };
 
@@ -144,6 +193,6 @@ public:
             std::cerr << "Document generated with no children\n";
             AddChild(new LitError());
         }
-        return "outColor = vec4("+children[0]->GenerateGLSL()+", 1.0);\n";
+        return "outColor = vec4(" + children[0]->GenerateGLSL() + ", 1.0);\n";
     }
 };

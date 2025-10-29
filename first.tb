@@ -1,1 +1,1 @@
-text(add(uv, sin(time)))
+text(negate(uv))
