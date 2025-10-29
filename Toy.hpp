@@ -73,6 +73,16 @@ class Tan : public Toy {
         return "tan(vec3("+children[0]->GenerateGLSL()+"))";
     }
 };
+class Texture : public Toy {
+    std::string GenerateGLSL() {
+        if (children.empty()) {
+            std::cerr << "Texture generated with no children\n";
+            AddChild(new LitError());
+        }
+        std::string childOutput = children[0]->GenerateGLSL();
+        return "texture(u_texture, vec2(vec3(" + childOutput + ").x, -vec3(" + childOutput + ").y)).xyz";
+    }
+};
 ////Binary
 class Multiply : public Toy {
     std::string GenerateGLSL() {
@@ -87,7 +97,6 @@ class Multiply : public Toy {
         return "vec3(" + children[0]->GenerateGLSL() + ") * vec3("+children[1]->GenerateGLSL() + ")";
     }
 };
-
 class Document : public Toy {
 public: 
     std::string GenerateGLSL() {

@@ -22,6 +22,11 @@ Swizzling
 -impossible?
 -Could make a function which returns the vector times 0 in all but the axis desired
 
+Example projects:
+CRT filter
+Roal Dalh filter
+Mandelbrot set
+
 Also: 
 some way to record or screenshot the page in browser (stretch)
 

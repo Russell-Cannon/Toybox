@@ -81,6 +81,16 @@ public:
                 return false;
             toy->AddChild(tan);
             return true;
+        } else if (next.value == "texture" || next.value == "text") {
+            if (lex.GetNext(str).type != OPEN_PARENTHESIS)
+                return false;
+            Toy* text = new Texture();
+            if (!ParseToy(str, text))
+                return false;
+            if (lex.GetNext(str).type != CLOSE_PARENTHESIS)
+                return false;
+            toy->AddChild(text);
+            return true;        
         } else if (next.value == "mult" || next.value == "multiply") {
             if (lex.GetNext(str).type != OPEN_PARENTHESIS)
                 return false;
