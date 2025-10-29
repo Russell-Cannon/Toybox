@@ -83,6 +83,7 @@ class Texture : public Toy {
         return "texture(u_texture, vec2(vec3(" + childOutput + ").x, -vec3(" + childOutput + ").y)).xyz";
     }
 };
+
 ////Binary
 class Multiply : public Toy {
     std::string GenerateGLSL() {
@@ -97,6 +98,46 @@ class Multiply : public Toy {
         return "vec3(" + children[0]->GenerateGLSL() + ") * vec3("+children[1]->GenerateGLSL() + ")";
     }
 };
+class Divide : public Toy {
+    std::string GenerateGLSL() {
+        if (children.empty()) {
+            std::cerr << "Divide generated with no children\n";
+            AddChild(new LitError());
+            AddChild(new LitError());
+        } else if (children.size() == 1) {
+            std::cerr << "Divide generated with only one child\n";
+            AddChild(new LitError());
+        }
+        return "vec3(" + children[0]->GenerateGLSL() + ") / vec3("+children[1]->GenerateGLSL() + ")";
+    }
+};
+class Add : public Toy {
+    std::string GenerateGLSL() {
+        if (children.empty()) {
+            std::cerr << "Add generated with no children\n";
+            AddChild(new LitError());
+            AddChild(new LitError());
+        } else if (children.size() == 1) {
+            std::cerr << "Add generated with only one child\n";
+            AddChild(new LitError());
+        }
+        return "vec3(" + children[0]->GenerateGLSL() + ") + vec3("+children[1]->GenerateGLSL() + ")";
+    }
+};
+class Subtract : public Toy {
+    std::string GenerateGLSL() {
+        if (children.empty()) {
+            std::cerr << "Subtract generated with no children\n";
+            AddChild(new LitError());
+            AddChild(new LitError());
+        } else if (children.size() == 1) {
+            std::cerr << "Subtract generated with only one child\n";
+            AddChild(new LitError());
+        }
+        return "vec3(" + children[0]->GenerateGLSL() + ") - vec3("+children[1]->GenerateGLSL() + ")";
+    }
+};
+
 class Document : public Toy {
 public: 
     std::string GenerateGLSL() {

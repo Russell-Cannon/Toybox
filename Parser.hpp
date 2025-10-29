@@ -31,6 +31,39 @@ public:
     postamble.close();
   }
 
+    template<typename t> bool ParseUnaryOperation(std::string& str, Toy* toy) {
+        Lexer lex;
+        if (lex.GetNext(str).type != OPEN_PARENTHESIS)
+            return false;
+        Toy* typedToy = new t();
+        if (!ParseToy(str, typedToy))
+            return false;
+        if (lex.GetNext(str).type != CLOSE_PARENTHESIS)
+            return false;
+        toy->AddChild(typedToy);
+        return true;
+    }
+
+    template<typename t> bool ParseBinaryOperation(std::string& str, Toy* toy) {
+        Lexer lex;
+        if (lex.GetNext(str).type != OPEN_PARENTHESIS)
+            return false;
+
+        Toy* typedToy = new t();
+        if (!ParseToy(str, typedToy))
+            return false;
+        if (lex.GetNext(str).type != COMMA)
+            return false;
+        if (!ParseToy(str, typedToy))
+            return false;
+
+        if (lex.GetNext(str).type != CLOSE_PARENTHESIS)
+            return false;
+
+        toy->AddChild(typedToy);
+        return true;
+    }
+
   bool ParseToy(std::string& str, Toy* toy) {
     Lexer lex;
     Token next = lex.GetNext(str);
@@ -42,72 +75,23 @@ public:
             toy->AddChild(new LitTime());
             return true;
         } else if (next.value == "fract" || next.value == "fraction" || next.value == "remainder") {
-            if (lex.GetNext(str).type != OPEN_PARENTHESIS)
-                return false;
-            Toy* fract = new Fract();
-            if (!ParseToy(str, fract))  //if true: fract is given a child
-                return false;
-            if (lex.GetNext(str).type != CLOSE_PARENTHESIS)
-                return false;
-            toy->AddChild(fract);
-            return true;
+            return ParseUnaryOperation<Fract>(str, toy);
         } else if (next.value == "sin") {
-            if (lex.GetNext(str).type != OPEN_PARENTHESIS)
-                return false;
-            Toy* sin = new Sin();
-            if (!ParseToy(str, sin))
-                return false;
-            if (lex.GetNext(str).type != CLOSE_PARENTHESIS)
-                return false;
-            toy->AddChild(sin);
-            return true;
+            return ParseUnaryOperation<Sin>(str, toy);
         } else if (next.value == "cos") {
-            if (lex.GetNext(str).type != OPEN_PARENTHESIS)
-                return false;
-            Toy* cos = new Cos();
-            if (!ParseToy(str, cos))
-                return false;
-            if (lex.GetNext(str).type != CLOSE_PARENTHESIS)
-                return false;
-            toy->AddChild(cos);
-            return true;
+            return ParseUnaryOperation<Cos>(str, toy);
         } else if (next.value == "tan") {
-            if (lex.GetNext(str).type != OPEN_PARENTHESIS)
-                return false;
-            Toy* tan = new Tan();
-            if (!ParseToy(str, tan))
-                return false;
-            if (lex.GetNext(str).type != CLOSE_PARENTHESIS)
-                return false;
-            toy->AddChild(tan);
-            return true;
+            return ParseUnaryOperation<Tan>(str, toy);
         } else if (next.value == "texture" || next.value == "text") {
-            if (lex.GetNext(str).type != OPEN_PARENTHESIS)
-                return false;
-            Toy* text = new Texture();
-            if (!ParseToy(str, text))
-                return false;
-            if (lex.GetNext(str).type != CLOSE_PARENTHESIS)
-                return false;
-            toy->AddChild(text);
-            return true;        
+            return ParseUnaryOperation<Texture>(str, toy);
         } else if (next.value == "mult" || next.value == "multiply") {
-            if (lex.GetNext(str).type != OPEN_PARENTHESIS)
-                return false;
-
-            Toy* mult = new Multiply();
-            if (!ParseToy(str, mult))
-                return false;
-            if (lex.GetNext(str).type != COMMA)
-                return false;
-            if (!ParseToy(str, mult))
-                return false;
-
-            if (lex.GetNext(str).type != CLOSE_PARENTHESIS)
-                return false;
-
-            toy->AddChild(mult);
-            return true;
+            return ParseBinaryOperation<Multiply>(str, toy);
+        } else if (next.value == "div" || next.value == "divide") {
+            return ParseBinaryOperation<Divide>(str, toy);
+        } else if (next.value == "add") {
+            return ParseBinaryOperation<Add>(str, toy);
+        } else if (next.value == "sub" || next.value == "subtract") {
+            return ParseBinaryOperation<Subtract>(str, toy);
         }
     } else if (next.type == NUMBER) {
         float number = std::atof(next.value.c_str());
