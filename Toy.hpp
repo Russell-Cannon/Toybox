@@ -17,19 +17,18 @@ public:
 class LitError : public Toy {
 public: 
     std::string GenerateGLSL() {
-        return "1.0, 0, 1.0";
+        return "vec3(1.0, 0, 1.0)";
     }
 };
 class LitUV : public Toy {
-    std::string GenerateGLSL() {return "gl_FragCoord.xy / iResolution, 0.0";}
+    std::string GenerateGLSL() {return "vec3(gl_FragCoord.xy / iResolution, 0.0)";}
 };
 class LitTime : public Toy {
-    std::string GenerateGLSL() {return "time, time, time";}
+    std::string GenerateGLSL() {return "vec3(time)";}
 };
 class LitNumber : public Toy {
     std::string GenerateGLSL() {
-        std::string floatToString = std::to_string(Value);
-        return floatToString + ", " + floatToString + ", " + floatToString;
+        return "vec3(" + std::to_string(Value) + ")";
     }
 public:
     float Value;
@@ -43,7 +42,7 @@ class Fract : public Toy {
             std::cerr << "Fract generated with no children\n";
             AddChild(new LitError());
         }
-        return "fract(vec3("+children[0]->GenerateGLSL()+"))";
+        return "fract("+children[0]->GenerateGLSL()+")";
     }
 };
 class Sin : public Toy {
@@ -52,7 +51,7 @@ class Sin : public Toy {
             std::cerr << "Sin generated with no children\n";
             AddChild(new LitError());
         }
-        return "sin(vec3("+children[0]->GenerateGLSL()+"))";
+        return "sin("+children[0]->GenerateGLSL()+")";
     }
 };
 class Cos : public Toy {
@@ -61,7 +60,7 @@ class Cos : public Toy {
             std::cerr << "Cos generated with no children\n";
             AddChild(new LitError());
         }
-        return "cos(vec3("+children[0]->GenerateGLSL()+"))";
+        return "cos("+children[0]->GenerateGLSL()+")";
     }
 };
 class Tan : public Toy {
@@ -70,7 +69,7 @@ class Tan : public Toy {
             std::cerr << "Tan generated with no children\n";
             AddChild(new LitError());
         }
-        return "tan(vec3("+children[0]->GenerateGLSL()+"))";
+        return "tan("+children[0]->GenerateGLSL()+")";
     }
 };
 class Texture : public Toy {
@@ -80,7 +79,7 @@ class Texture : public Toy {
             AddChild(new LitError());
         }
         std::string childOutput = children[0]->GenerateGLSL();
-        return "texture(u_texture, vec2(vec3(" + childOutput + ").x, -vec3(" + childOutput + ").y)).xyz";
+        return "texture(u_texture, vec2(" + childOutput + ".x, -" + childOutput + ".y)).xyz";
     }
 };
 
@@ -95,7 +94,7 @@ class Multiply : public Toy {
             std::cerr << "Multiply generated with only one child\n";
             AddChild(new LitError());
         }
-        return "vec3(" + children[0]->GenerateGLSL() + ") * vec3("+children[1]->GenerateGLSL() + ")";
+        return "(" + children[0]->GenerateGLSL() + " * "+children[1]->GenerateGLSL() + ")";
     }
 };
 class Divide : public Toy {
@@ -108,7 +107,7 @@ class Divide : public Toy {
             std::cerr << "Divide generated with only one child\n";
             AddChild(new LitError());
         }
-        return "vec3(" + children[0]->GenerateGLSL() + ") / vec3("+children[1]->GenerateGLSL() + ")";
+        return "(" + children[0]->GenerateGLSL() + " / " +children[1]->GenerateGLSL() + ")";
     }
 };
 class Add : public Toy {
@@ -121,7 +120,7 @@ class Add : public Toy {
             std::cerr << "Add generated with only one child\n";
             AddChild(new LitError());
         }
-        return "vec3(" + children[0]->GenerateGLSL() + ") + vec3("+children[1]->GenerateGLSL() + ")";
+        return "(" + children[0]->GenerateGLSL() + " + "+children[1]->GenerateGLSL() + ")";
     }
 };
 class Subtract : public Toy {
@@ -134,7 +133,7 @@ class Subtract : public Toy {
             std::cerr << "Subtract generated with only one child\n";
             AddChild(new LitError());
         }
-        return "vec3(" + children[0]->GenerateGLSL() + ") - vec3("+children[1]->GenerateGLSL() + ")";
+        return "(" + children[0]->GenerateGLSL() + " - "+children[1]->GenerateGLSL() + ")";
     }
 };
 

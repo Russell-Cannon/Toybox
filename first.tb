@@ -1,1 +1,1 @@
-texture(add(uv, sin(time)))
+text(add(uv, sin(time)))

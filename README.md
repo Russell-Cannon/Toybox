@@ -26,6 +26,7 @@ Example projects:
 CRT filter
 Roal Dalh filter
 Mandelbrot set
+Waving flag
 
 Also: 
 some way to record or screenshot the page in browser (stretch)
