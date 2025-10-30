@@ -24,7 +24,7 @@ public:
 
 
   void Parse(std::string str) {
-    ParseToy(str, &document);
+    Parse(str, &document);
   }
 
   void GenerateGLSL(std::string outputFileName) {
@@ -47,7 +47,7 @@ public:
             return SyntaxError("Expected opening parenthesis in " + std::to_string(arguments) + "-ary operation");
         Toy* typedToy = new ToyType();
         for (int i = 0; i < arguments; i++) {
-            if (!ParseToy(str, typedToy))
+            if (!Parse(str, typedToy))
                 return SyntaxError("Expected argument #" + std::to_string(i + 1) + " in " + std::to_string(arguments) + "-ary operation");
             if (i < arguments - 1) { //not the last arguments
                 if (lex.GetNext(str, lineCount).type != COMMA)
@@ -70,7 +70,7 @@ public:
     }
 
 
-  bool ParseToy(std::string& str, Toy* toy) {
+bool ParseToy(std::string& str, Toy* toy) {
     Lexer lex;
     Token next = lex.GetNext(str, lineCount);
     if (next.type == IDENTIFIER) {
@@ -131,7 +131,7 @@ public:
         //In the case of ()
         if (lex.PeekNext(str).type == CLOSE_PARENTHESIS)
             return true;
-        if (!ParseToy(str, toy))
+        if (!Parse(str, toy))
             return false;
         if (lex.GetNext(str, lineCount).type != CLOSE_PARENTHESIS)
             return SyntaxError("Expected closing parenthesis after empty opening parenthesis");
@@ -140,5 +140,28 @@ public:
         return true;
     }
     return SyntaxError("Unexpected symbol: " + next.type.name);
+}
+
+  bool Parse(std::string& str, Toy* toy) {
+    Lexer lex;
+    Toy* temp = new Toy();
+    if (!ParseToy(str, temp)) 
+        return false;
+    
+    //Only peek: we don't always expect a .? but we want one.
+    if (lex.PeekNext(str).type == AXIS) {
+        std::string axis = lex.GetNext(str, lineCount).value;
+        Toy* returnToy;
+        if (axis[1] == 'x' || axis[1] == 'r' || axis[1] == 'u')
+            returnToy = new X();
+        if (axis[1] == 'y' || axis[1] == 'g' || axis[1] == 'v')
+            returnToy = new Y();
+        if (axis[1] == 'z' || axis[1] == 'b')
+            returnToy = new Z();
+        returnToy->AddChild(temp->children[0]);
+        toy->AddChild(returnToy);
+    }
+    toy->AddChild(temp->children[0]);
+    return true;
   }
 };

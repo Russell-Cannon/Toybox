@@ -12,8 +12,8 @@ const TokenType
     OPEN_PARENTHESIS{"Open Parenthesis", std::regex("^\\(")},
     CLOSE_PARENTHESIS{"Close Parenthesis", std::regex("^\\)")},
     COMMA{"Comma", std::regex("^,")},
-    NUMBER{"Number", std::regex("^-?[0-9\\.]+[fd]?", std::regex::icase)},
-    AXES{"Axis", std::regex("^\\.[xyzwrgbastpquv]{1,4}", std::regex::icase)},
+    NUMBER{"Number", std::regex("(^-?[0-9]*\\.[0-9]+[fd]?|^-?[0-9]+[fd]?)", std::regex::icase)},
+    AXIS{"Axis", std::regex("^\\.[xyzwrgbastpquv]", std::regex::icase)},
     EOI{"END OF INPUT", std::regex("\\b\\B")},
     ERROR{"UNKNOWN SYMBOL", std::regex("\\b\\B")};
 
@@ -24,7 +24,7 @@ const TokenType TokenTypes[] = {
     CLOSE_PARENTHESIS,
     COMMA,
     NUMBER,
-    AXES
+    AXIS
 };
 
 class Lexer {
