@@ -40,7 +40,7 @@ public:
     std::smatch match;
     if (str.length() == 0) return {ERROR, "Empty String"};
 
-    while (str.length() > 0 && str[0] == ' ')
+    while (str.length() > 0 && (str[0] == ' ' || str[0] == '\n' || str[0] == '\t'))
       str = str.substr(1);
 
     DEBUG("Current string: ", str);

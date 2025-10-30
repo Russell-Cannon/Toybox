@@ -118,6 +118,42 @@ class Negate : public Toy {
         return "(-" + children[0]->GenerateGLSL() + ")";
     }
 };
+class Absolute : public Toy {
+    std::string GenerateGLSL() {
+        if (children.empty()) {
+            std::cerr << "Absolute generated with no children\n";
+            AddChild(new LitError());
+        }
+        return "abs(" + children[0]->GenerateGLSL() + ")";
+    }
+};
+class X : public Toy {
+    std::string GenerateGLSL() {
+        if (children.empty()) {
+            std::cerr << "X generated with no children\n";
+            AddChild(new LitError());
+        }
+        return "vec3(" + children[0]->GenerateGLSL() + ".x)";
+    }
+};
+class Y : public Toy {
+    std::string GenerateGLSL() {
+        if (children.empty()) {
+            std::cerr << "Y generated with no children\n";
+            AddChild(new LitError());
+        }
+        return "vec3(" + children[0]->GenerateGLSL() + ".y)";
+    }
+};
+class Z : public Toy {
+    std::string GenerateGLSL() {
+        if (children.empty()) {
+            std::cerr << "Z generated with no children\n";
+            AddChild(new LitError());
+        }
+        return "vec3(" + children[0]->GenerateGLSL() + ".z)";
+    }
+};
 
 ////Binary
 class Multiply : public Toy {
@@ -202,6 +238,24 @@ class Combine : public Toy {
             AddChild(new LitError());
         }
         return "vec3(" + children[0]->GenerateGLSL() + ".x, " + children[1]->GenerateGLSL() + ".y, " + children[2]->GenerateGLSL() + ".z)";
+    }
+};
+class Clamp : public Toy {
+    std::string GenerateGLSL() {
+        if (children.empty()) {
+            std::cerr << "Clamp generated with no children\n";
+            AddChild(new LitError());
+            AddChild(new LitError());
+            AddChild(new LitError());
+        } else if (children.size() == 2) {
+            std::cerr << "Clamp generated only two children\n";
+            AddChild(new LitError());
+        } else if (children.size() == 1) {
+            std::cerr << "Clamp generated with only one child\n";
+            AddChild(new LitError());
+            AddChild(new LitError());
+        }
+        return "clamp(" + children[0]->GenerateGLSL() + ", " + children[1]->GenerateGLSL() + ", " + children[2]->GenerateGLSL() + ")";
     }
 };
 

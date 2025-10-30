@@ -21,7 +21,8 @@ Shorthand for useful functions: sobel, gaussian, noise,
 Swizzling
 -impossible?
 -Could make a function which returns the vector times 0 in all but the axis desired
--Make a 'combine' function which takes a parameter for each axis
+/Make a 'combine' function which takes a parameter for each axis
+-Need an X or Y or Z function which returns a vector3 of just that desired axis from the argument
 
 Example projects:
 CRT filter

@@ -33,32 +33,48 @@ public:
 
     template<typename ToyType> bool ParseUnaryOperation(std::string& str, Toy* toy) {
         Lexer lex;
-        if (lex.GetNext(str).type != OPEN_PARENTHESIS)
+        if (lex.GetNext(str).type != OPEN_PARENTHESIS) {
+            std::cerr << "Expected opening parenthesis in unary operation";
             return false;
+        }
         Toy* typedToy = new ToyType();
-        if (!ParseToy(str, typedToy))
+        if (!ParseToy(str, typedToy)) {
+            std::cerr << "Expected argument in unary operation";
             return false;
-        if (lex.GetNext(str).type != CLOSE_PARENTHESIS)
+        }
+        if (lex.GetNext(str).type != CLOSE_PARENTHESIS) {
+            std::cerr << "Expected closing parenthesis in unary operation";
             return false;
+        }
         toy->AddChild(typedToy);
         return true;
     }
 
     template<typename ToyType> bool ParseBinaryOperation(std::string& str, Toy* toy) {
         Lexer lex;
-        if (lex.GetNext(str).type != OPEN_PARENTHESIS)
+        if (lex.GetNext(str).type != OPEN_PARENTHESIS) {
+            std::cerr << "Expected opening parenthesis in binary operation";
             return false;
+        }
 
         Toy* typedToy = new ToyType();
-        if (!ParseToy(str, typedToy))
+        if (!ParseToy(str, typedToy)) {
+            std::cerr << "Expected argument in binary operation";
             return false;
-        if (lex.GetNext(str).type != COMMA)
+        }
+        if (lex.GetNext(str).type != COMMA) {
+            std::cerr << "Expected comma after first argument in binary operation";
             return false;
-        if (!ParseToy(str, typedToy))
+        }
+        if (!ParseToy(str, typedToy)) {
+            std::cerr << "Expected second argument in binary operation";
             return false;
+        }
 
-        if (lex.GetNext(str).type != CLOSE_PARENTHESIS)
+        if (lex.GetNext(str).type != CLOSE_PARENTHESIS) {
+            std::cerr << "Expected closing parenthesis in binary operation";
             return false;
+        }
 
         toy->AddChild(typedToy);
         return true;
@@ -66,23 +82,37 @@ public:
 
     template<typename ToyType> bool ParseTrinaryOperation(std::string& str, Toy* toy) {
         Lexer lex;
-        if (lex.GetNext(str).type != OPEN_PARENTHESIS)
+        if (lex.GetNext(str).type != OPEN_PARENTHESIS) {
+            std::cerr << "Expected opening parenthesis in trinary operation";
             return false;
+        }
 
         Toy* typedToy = new ToyType();
-        if (!ParseToy(str, typedToy))
+        if (!ParseToy(str, typedToy)) {
+            std::cerr << "Expected argument in trinary operation";
             return false;
-        if (lex.GetNext(str).type != COMMA)
+        }
+        if (lex.GetNext(str).type != COMMA) {
+            std::cerr << "Expected comma after first argument in trinary operation";
             return false;
-        if (!ParseToy(str, typedToy))
+        }
+        if (!ParseToy(str, typedToy)) {
+            std::cerr << "Expected second argument in trinary operation";
             return false;
-        if (lex.GetNext(str).type != COMMA)
+        }
+        if (lex.GetNext(str).type != COMMA) {
+            std::cerr << "Expected comma after second argument in trinary operation";
             return false;
-        if (!ParseToy(str, typedToy))
+        }
+        if (!ParseToy(str, typedToy)) {
+            std::cerr << "Expected third argument in trinary operation";
             return false;
+        }
 
-        if (lex.GetNext(str).type != CLOSE_PARENTHESIS)
+        if (lex.GetNext(str).type != CLOSE_PARENTHESIS) {
+            std::cerr << "Expected closing parenthesis in trinary operation";
             return false;
+        }
 
         toy->AddChild(typedToy);
         return true;
@@ -116,6 +146,14 @@ public:
             return ParseUnaryOperation<Round>(str, toy);
         } else if (next.value == "neg" || next.value == "negate") {
             return ParseUnaryOperation<Negate>(str, toy);
+        } else if (next.value == "abs" || next.value == "absolute") {
+            return ParseUnaryOperation<Absolute>(str, toy);
+        } else if (next.value == "x") {
+            return ParseUnaryOperation<X>(str, toy);
+        } else if (next.value == "y") {
+            return ParseUnaryOperation<Y>(str, toy);
+        } else if (next.value == "z") {
+            return ParseUnaryOperation<Z>(str, toy);
         } else if (next.value == "mul" || next.value == "mult" || next.value == "multiply") {
             return ParseBinaryOperation<Multiply>(str, toy);
         } else if (next.value == "div" || next.value == "divide") {
@@ -128,6 +166,8 @@ public:
             return ParseBinaryOperation<Modulus>(str, toy);
         } else if (next.value == "com" || next.value == "comb" || next.value == "combine") {
             return ParseTrinaryOperation<Combine>(str, toy);
+        } else if (next.value == "clamp") {
+            return ParseTrinaryOperation<Clamp>(str, toy);
         }
     } else if (next.type == NUMBER) {
         float number = std::atof(next.value.c_str());
