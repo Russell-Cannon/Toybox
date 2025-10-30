@@ -24,7 +24,7 @@ struct TokenType { //A token is a symbol which can be resolved using a (regex) p
 struct Token {
 	const TokenType type;
 	std::string value;
-	void Print() {
-		std::cout << type.name << ": " << value << '\n';
+	std::string ToString() {
+		return type.name + ": " + value;
 	}
 };

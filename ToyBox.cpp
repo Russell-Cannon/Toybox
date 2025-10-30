@@ -7,20 +7,21 @@
 
 int main(int argc, char *argv[]) {
   std::ifstream fin;
+  std::string filename;
 
   if (argc > 1) {
-    fin.open(argv[1]);
+    filename = argv[1];
   } else {
     std::cout << "Enter file name: ";
-    std::string fileName = "first.tb"; // fix on release
-    std::cin >> fileName;
-    fin.open(fileName);
+    filename = "first.tb"; // fix on release
+    std::cin >> filename;
   }
+  fin.open(filename);
   
   std::stringstream buffer;
   buffer<<fin.rdbuf();
   fin.close();
-  Parser parser;
+  Parser parser(filename);
 
   parser.Parse(buffer.str());
   parser.GenerateGLSL("out.html");

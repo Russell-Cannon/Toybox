@@ -166,7 +166,7 @@ class Multiply : public Toy {
             std::cerr << "Multiply generated with only one child\n";
             AddChild(new LitError());
         }
-        return "(" + children[0]->GenerateGLSL() + " * "+children[1]->GenerateGLSL() + ")";
+        return "(" + children[0]->GenerateGLSL() + " * " + children[1]->GenerateGLSL() + ")";
     }
 };
 class Divide : public Toy {

@@ -12,9 +12,9 @@ const TokenType
     OPEN_PARENTHESIS{"Open Parenthesis", std::regex("^\\(")},
     CLOSE_PARENTHESIS{"Close Parenthesis", std::regex("^\\)")},
     COMMA{"Comma", std::regex("^,")},
-    PERIOD{"Period", std::regex("^\\.")},
     NUMBER{"Number", std::regex("^-?[0-9\\.]+[fd]?", std::regex::icase)},
-    AXES{"Axis", std::regex("^[xyzwrgbastpquv]{1,4}", std::regex::icase)},
+    AXES{"Axis", std::regex("^\\.[xyzwrgbastpquv]{1,4}", std::regex::icase)},
+    EOI{"END OF INPUT", std::regex("\\b\\B")},
     ERROR{"UNKNOWN SYMBOL", std::regex("\\b\\B")};
 
 // List of tokens which are checked against
@@ -23,33 +23,31 @@ const TokenType TokenTypes[] = {
     OPEN_PARENTHESIS,
     CLOSE_PARENTHESIS,
     COMMA,
-    PERIOD,
     NUMBER,
-    AXES,
-    ERROR,
+    AXES
 };
 
 class Lexer {
-  std::string file;
-
 public:
   Lexer() { }
-  Lexer(std::string str) : file(str) { }
 
-  Token GetNext(std::string& str) {
+  Token GetNext(std::string& str, int& _lineCount) {
     std::smatch match;
-    if (str.length() == 0) return {ERROR, "Empty String"};
+    if (str.length() == 0) return {EOI, "Empty String"};
 
-    while (str.length() > 0 && (str[0] == ' ' || str[0] == '\n' || str[0] == '\t'))
+    while (str.length() > 0 && (str[0] == ' ' || str[0] == '\n' || str[0] == '\t')) {
+      if (str[0] == '\n')
+        _lineCount++;
       str = str.substr(1);
+    }
 
     DEBUG("Current string: ", str);
     for (TokenType tt : TokenTypes) {
       if (std::regex_search(str, match, tt.pattern)) {
         std::string found = match[0].str();        
-        str = str.substr(found.length());
-        DEBUG("Found: ", tt.name);
         std::transform(found.begin(), found.end(), found.begin(), ::tolower);
+        DEBUG("Found: ", tt.name);
+        str = str.substr(found.length());
         return {tt, found};
       }
     }
@@ -57,11 +55,9 @@ public:
     return {ERROR, str};
   }
 
-  Token GetNext() {
-    return GetNext(file);
-  }
-
-  bool Done() {
-    return file.length() == 0;
+  Token PeekNext(std::string& str) {
+    int n = 0;
+    std::string temp(str);
+    return GetNext(temp, n);
   }
 };

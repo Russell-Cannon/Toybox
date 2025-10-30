@@ -6,12 +6,22 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
+#include <string>
 
 class Parser {
   Document document;
+  std::string filename;
+  int lineCount = 1;
 
 public:
-  Parser() {}
+  Parser() : filename("undefined") {}
+  Parser(std::string _filename) : filename(_filename) {}
+
+    bool SyntaxError(std::string message) {
+        std::cerr << filename << ':' << lineCount << " : " << message << '\n';
+        return false;
+    }
+
 
   void Parse(std::string str) {
     ParseToy(str, &document);
@@ -31,96 +41,38 @@ public:
     postamble.close();
   }
 
+    template<typename ToyType> bool ParseNAryOperation(std::string& str, Toy* toy, int arguments) {
+        Lexer lex;
+        if (lex.GetNext(str, lineCount).type != OPEN_PARENTHESIS)
+            return SyntaxError("Expected opening parenthesis in " + std::to_string(arguments) + "-ary operation");
+        Toy* typedToy = new ToyType();
+        for (int i = 0; i < arguments; i++) {
+            if (!ParseToy(str, typedToy))
+                return SyntaxError("Expected argument #" + std::to_string(i + 1) + " in " + std::to_string(arguments) + "-ary operation");
+            if (i < arguments - 1) { //not the last arguments
+                if (lex.GetNext(str, lineCount).type != COMMA)
+                    return SyntaxError("Expected comma after argument #" + std::to_string(i + 1) + " in " + std::to_string(arguments) + "-ary operation");
+            }
+        }
+        if (lex.GetNext(str, lineCount).type != CLOSE_PARENTHESIS)
+            return SyntaxError("Expected closing parenthesis in " + std::to_string(arguments) + "-ary operation");
+        toy->AddChild(typedToy);
+        return true;
+    }
     template<typename ToyType> bool ParseUnaryOperation(std::string& str, Toy* toy) {
-        Lexer lex;
-        if (lex.GetNext(str).type != OPEN_PARENTHESIS) {
-            std::cerr << "Expected opening parenthesis in unary operation";
-            return false;
-        }
-        Toy* typedToy = new ToyType();
-        if (!ParseToy(str, typedToy)) {
-            std::cerr << "Expected argument in unary operation";
-            return false;
-        }
-        if (lex.GetNext(str).type != CLOSE_PARENTHESIS) {
-            std::cerr << "Expected closing parenthesis in unary operation";
-            return false;
-        }
-        toy->AddChild(typedToy);
-        return true;
+        return ParseNAryOperation<ToyType>(str, toy, 1);
     }
-
     template<typename ToyType> bool ParseBinaryOperation(std::string& str, Toy* toy) {
-        Lexer lex;
-        if (lex.GetNext(str).type != OPEN_PARENTHESIS) {
-            std::cerr << "Expected opening parenthesis in binary operation";
-            return false;
-        }
-
-        Toy* typedToy = new ToyType();
-        if (!ParseToy(str, typedToy)) {
-            std::cerr << "Expected argument in binary operation";
-            return false;
-        }
-        if (lex.GetNext(str).type != COMMA) {
-            std::cerr << "Expected comma after first argument in binary operation";
-            return false;
-        }
-        if (!ParseToy(str, typedToy)) {
-            std::cerr << "Expected second argument in binary operation";
-            return false;
-        }
-
-        if (lex.GetNext(str).type != CLOSE_PARENTHESIS) {
-            std::cerr << "Expected closing parenthesis in binary operation";
-            return false;
-        }
-
-        toy->AddChild(typedToy);
-        return true;
+        return ParseNAryOperation<ToyType>(str, toy, 2);
     }
-
     template<typename ToyType> bool ParseTrinaryOperation(std::string& str, Toy* toy) {
-        Lexer lex;
-        if (lex.GetNext(str).type != OPEN_PARENTHESIS) {
-            std::cerr << "Expected opening parenthesis in trinary operation";
-            return false;
-        }
-
-        Toy* typedToy = new ToyType();
-        if (!ParseToy(str, typedToy)) {
-            std::cerr << "Expected argument in trinary operation";
-            return false;
-        }
-        if (lex.GetNext(str).type != COMMA) {
-            std::cerr << "Expected comma after first argument in trinary operation";
-            return false;
-        }
-        if (!ParseToy(str, typedToy)) {
-            std::cerr << "Expected second argument in trinary operation";
-            return false;
-        }
-        if (lex.GetNext(str).type != COMMA) {
-            std::cerr << "Expected comma after second argument in trinary operation";
-            return false;
-        }
-        if (!ParseToy(str, typedToy)) {
-            std::cerr << "Expected third argument in trinary operation";
-            return false;
-        }
-
-        if (lex.GetNext(str).type != CLOSE_PARENTHESIS) {
-            std::cerr << "Expected closing parenthesis in trinary operation";
-            return false;
-        }
-
-        toy->AddChild(typedToy);
-        return true;
+        return ParseNAryOperation<ToyType>(str, toy, 3);
     }
+
 
   bool ParseToy(std::string& str, Toy* toy) {
     Lexer lex;
-    Token next = lex.GetNext(str);
+    Token next = lex.GetNext(str, lineCount);
     if (next.type == IDENTIFIER) {
         if (next.value == "uv") {
             toy->AddChild(new LitUV());
@@ -175,7 +127,18 @@ public:
         (*litNum).Value = number;
         toy->AddChild(litNum);
         return litNum;
+    } if (next.type == OPEN_PARENTHESIS) { //empty parenthesis are legal
+        //In the case of ()
+        if (lex.PeekNext(str).type == CLOSE_PARENTHESIS)
+            return true;
+        if (!ParseToy(str, toy))
+            return false;
+        if (lex.GetNext(str, lineCount).type != CLOSE_PARENTHESIS)
+            return SyntaxError("Expected closing parenthesis after empty opening parenthesis");
+        return true;
+    } else if (next.type == EOI) {
+        return true;
     }
-    return false;
+    return SyntaxError("Unexpected symbol: " + next.type.name);
   }
 };
