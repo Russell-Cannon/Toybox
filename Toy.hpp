@@ -221,6 +221,19 @@ class Modulus : public Toy {
         return "mod(" + children[0]->GenerateGLSL() + ", " + children[1]->GenerateGLSL() + ")";
     }
 };
+class Step : public Toy {
+    std::string GenerateGLSL() {
+        if (children.empty()) {
+            std::cerr << "Step generated with no children\n";
+            AddChild(new LitError());
+            AddChild(new LitError());
+        } else if (children.size() == 1) {
+            std::cerr << "Step generated with only one child\n";
+            AddChild(new LitError());
+        }
+        return "step(" + children[0]->GenerateGLSL() + ", " + children[1]->GenerateGLSL() + ")";
+    }
+};
 ////Trinary
 class Combine : public Toy {
     std::string GenerateGLSL() {
@@ -258,6 +271,43 @@ class Clamp : public Toy {
         return "clamp(" + children[0]->GenerateGLSL() + ", " + children[1]->GenerateGLSL() + ", " + children[2]->GenerateGLSL() + ")";
     }
 };
+class Mix : public Toy {
+    std::string GenerateGLSL() {
+        if (children.empty()) {
+            std::cerr << "Mix generated with no children\n";
+            AddChild(new LitError());
+            AddChild(new LitError());
+            AddChild(new LitError());
+        } else if (children.size() == 2) {
+            std::cerr << "Mix generated only two children\n";
+            AddChild(new LitError());
+        } else if (children.size() == 1) {
+            std::cerr << "Mix generated with only one child\n";
+            AddChild(new LitError());
+            AddChild(new LitError());
+        }
+        return "mix(" + children[0]->GenerateGLSL() + ", " + children[1]->GenerateGLSL() + ", " + children[2]->GenerateGLSL() + ")";
+    }
+};
+class SmoothStep : public Toy {
+    std::string GenerateGLSL() {
+        if (children.empty()) {
+            std::cerr << "Smooth Step generated with no children\n";
+            AddChild(new LitError());
+            AddChild(new LitError());
+            AddChild(new LitError());
+        } else if (children.size() == 2) {
+            std::cerr << "Smooth Step generated only two children\n";
+            AddChild(new LitError());
+        } else if (children.size() == 1) {
+            std::cerr << "Smooth Step generated with only one child\n";
+            AddChild(new LitError());
+            AddChild(new LitError());
+        }
+        return "smoothstep(" + children[0]->GenerateGLSL() + ", " + children[1]->GenerateGLSL() + ", " + children[2]->GenerateGLSL() + ")";
+    }
+};
+
 
 class Document : public Toy {
 public: 

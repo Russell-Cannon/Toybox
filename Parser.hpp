@@ -116,11 +116,18 @@ bool ParseToy(std::string& str, Toy* toy) {
             return ParseBinaryOperation<Subtract>(str, toy);
         } else if (next.value == "mod" || next.value == "modulus" || next.value == "modulo") {
             return ParseBinaryOperation<Modulus>(str, toy);
+        } else if (next.value == "step" || next.value == "if") {
+            return ParseBinaryOperation<Step>(str, toy);
         } else if (next.value == "com" || next.value == "comb" || next.value == "combine") {
             return ParseTrinaryOperation<Combine>(str, toy);
         } else if (next.value == "clamp") {
             return ParseTrinaryOperation<Clamp>(str, toy);
-        }
+        } else if (next.value == "mix" || next.value == "lerp") {
+            return ParseTrinaryOperation<Mix>(str, toy);
+        } else if (next.value == "smoothstep") {
+            return ParseTrinaryOperation<SmoothStep>(str, toy);
+        } else 
+            return SyntaxError("Unknown identifier: " + next.value);
     } else if (next.type == NUMBER) {
         float number = std::atof(next.value.c_str());
         LitNumber* litNum = new LitNumber();
