@@ -13,6 +13,7 @@ const TokenType
     CLOSE_PARENTHESIS{"Close Parenthesis", std::regex("^\\)")},
     COMMA{"Comma", std::regex("^,")},
     NUMBER{"Number", std::regex("(^-?[0-9]*\\.[0-9]+[fd]?|^-?[0-9]+[fd]?)", std::regex::icase)},
+    OPERATOR{"Mathematical Operator", std::regex("^[+-/*]")},
     AXIS{"Axis", std::regex("^\\.[xyzwrgbastpquv]", std::regex::icase)},
     EOI{"END OF INPUT", std::regex("\\b\\B")},
     ERROR{"UNKNOWN SYMBOL", std::regex("\\b\\B")};
@@ -24,6 +25,7 @@ const TokenType TokenTypes[] = {
     CLOSE_PARENTHESIS,
     COMMA,
     NUMBER,
+    OPERATOR,
     AXIS
 };
 
@@ -33,13 +35,14 @@ public:
 
   Token GetNext(std::string& str, int& _lineCount) {
     std::smatch match;
-    if (str.length() == 0) return {EOI, "Empty String"};
 
     while (str.length() > 0 && (str[0] == ' ' || str[0] == '\n' || str[0] == '\t')) {
       if (str[0] == '\n')
         _lineCount++;
       str = str.substr(1);
     }
+
+    if (str.length() == 0) return {EOI, "Empty String"};    
 
     DEBUG("Current string: ", str);
     for (TokenType tt : TokenTypes) {

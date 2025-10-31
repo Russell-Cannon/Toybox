@@ -130,14 +130,14 @@ bool ParseToy(std::string& str, Toy* toy) {
     } if (next.type == OPEN_PARENTHESIS) { //empty parenthesis are legal
         //In the case of ()
         if (lex.PeekNext(str).type == CLOSE_PARENTHESIS)
-            return true;
+            return false;
         if (!Parse(str, toy))
             return false;
         if (lex.GetNext(str, lineCount).type != CLOSE_PARENTHESIS)
             return SyntaxError("Expected closing parenthesis after empty opening parenthesis");
         return true;
     } else if (next.type == EOI) {
-        return true;
+        return false;
     }
     return SyntaxError("Unexpected symbol: " + next.type.name);
 }
@@ -154,14 +154,44 @@ bool ParseToy(std::string& str, Toy* toy) {
         Toy* returnToy;
         if (axis[1] == 'x' || axis[1] == 'r' || axis[1] == 'u')
             returnToy = new X();
-        if (axis[1] == 'y' || axis[1] == 'g' || axis[1] == 'v')
+        else if (axis[1] == 'y' || axis[1] == 'g' || axis[1] == 'v')
             returnToy = new Y();
-        if (axis[1] == 'z' || axis[1] == 'b')
+        else if (axis[1] == 'z' || axis[1] == 'b')
             returnToy = new Z();
         returnToy->AddChild(temp->children[0]);
         toy->AddChild(returnToy);
+        return true;
+    } else if (lex.PeekNext(str).type == OPERATOR) {
+        return ParseMathematicalOperator(str, toy, temp);
     }
+
     toy->AddChild(temp->children[0]);
     return true;
   }
+
+    bool ParseMathematicalOperator(std::string& str, Toy* toy, Toy* first) {
+        Lexer lex;
+        
+        std::string op = lex.GetNext(str, lineCount).value;
+        Toy* returnToy;        
+        if (op == "+")
+            returnToy = new Add();
+        else if (op == "-")
+            returnToy = new Subtract();
+        else if (op == "*")
+            returnToy = new Multiply();
+        else if (op == "/")
+            returnToy = new Divide();
+
+        Toy* second = new Toy();
+        if (!Parse(str, second))            
+            return SyntaxError("No operand to the right of " + op);
+
+        returnToy->AddChild(first->children[0]);
+        returnToy->AddChild(second->children[0]);
+        toy->AddChild(returnToy);
+
+        return true;
+    }
+
 };

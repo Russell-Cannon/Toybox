@@ -6,7 +6,7 @@
 #include <iostream>
 
 #define DEBUG(MSG, VALUE)
-#define DEBUG(MSG, VALUE) std::cout << (MSG) << (VALUE) << std::endl
+// #define DEBUG(MSG, VALUE) std::cout << (MSG) << (VALUE) << std::endl
 
 struct TokenType;
 struct Token;

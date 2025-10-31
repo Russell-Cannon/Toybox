@@ -1,26 +1,7 @@
 text(
-    mult(
-        2,
-        add(
-            uv,
-            combine(0, x(
-                mult( 
-                    0.25,
-                    add(
-                        uv,
-                        add(10,
-                            sin(
-                                add(
-                                    mult(5,
-                                        uv
-                                    ),
-                                    time
-                                )
-                            ) 
-                        )
-                    )
-                )
-            ), 0)
-        )
+    2*(uv + combine(
+        0, 
+        x(0.25 * (uv + 2 + sin((10*uv) + time))), 
+        0)
     )
 )
