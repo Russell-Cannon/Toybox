@@ -307,7 +307,23 @@ class SmoothStep : public Toy {
         return "smoothstep(" + children[0]->GenerateGLSL() + ", " + children[1]->GenerateGLSL() + ", " + children[2]->GenerateGLSL() + ")";
     }
 };
-
+//n-ary
+class Average : public Toy {
+    std::string GenerateGLSL() {
+        if (children.empty()) {
+            std::cerr << "Average generated with no children\n";
+            AddChild(new LitError());
+        }
+        std::string output = "((";
+        for (int i = 0; i < children.size(); i++) {
+            output += children[i]->GenerateGLSL();
+            if (i < children.size() - 1)
+                output += " + ";
+        }
+        output += ") / vec3(" + std::to_string(children.size()) + ".0))";
+        return output;
+    }
+};
 
 class Document : public Toy {
 public: 

@@ -1,1 +1,1 @@
-step( 0.75, fract(time))
+average(0,1)

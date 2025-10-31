@@ -68,6 +68,25 @@ public:
     template<typename ToyType> bool ParseTrinaryOperation(std::string& str, Toy* toy) {
         return ParseNAryOperation<ToyType>(str, toy, 3);
     }
+    template<typename ToyType> bool ParseExpandingSizeOperation(std::string& str, Toy* toy) {
+        Lexer lex;
+        if (lex.GetNext(str, lineCount).type != OPEN_PARENTHESIS)
+            return SyntaxError("Expected opening parenthesis in expanding size operation");
+        Toy* typedToy = new ToyType();
+        //at least one argument is required
+        if (!Parse(str, typedToy))
+            return SyntaxError("Expected argument in expanding size operation");
+
+        while (lex.PeekNext(str).type == COMMA) {
+            lex.GetNext(str, lineCount); //consume comma
+            if (!Parse(str, typedToy))
+                return SyntaxError("Expected argument after comma in expanding size operation");
+        }
+        if (lex.GetNext(str, lineCount).type != CLOSE_PARENTHESIS)
+            return SyntaxError("Expected closing parenthesis in expanding size operation");
+        toy->AddChild(typedToy);
+        return true;
+    }
 
 
 bool ParseToy(std::string& str, Toy* toy) {
@@ -126,6 +145,8 @@ bool ParseToy(std::string& str, Toy* toy) {
             return ParseTrinaryOperation<Mix>(str, toy);
         } else if (next.value == "smoothstep") {
             return ParseTrinaryOperation<SmoothStep>(str, toy);
+        } else if (next.value == "avg" || next.value == "average") {
+            return ParseExpandingSizeOperation<Average>(str, toy);
         } else 
             return SyntaxError("Unknown identifier: " + next.value);
     } else if (next.type == NUMBER) {
