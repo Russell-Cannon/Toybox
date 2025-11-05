@@ -43,19 +43,19 @@ public:
 
     template<typename ToyType> bool ParseNAryOperation(std::string& str, Toy* toy, int arguments) {
         Lexer lex;
-        if (lex.GetNext(str, lineCount).type != OPEN_PARENTHESIS)
-            return SyntaxError("Expected opening parenthesis in " + std::to_string(arguments) + "-ary operation");
         Toy* typedToy = new ToyType();
+        if (lex.GetNext(str, lineCount).type != OPEN_PARENTHESIS)
+            return SyntaxError("Expected opening parenthesis in " + typedToy->Name() + " operation");
         for (int i = 0; i < arguments; i++) {
             if (!Parse(str, typedToy))
-                return SyntaxError("Expected argument #" + std::to_string(i + 1) + " in " + std::to_string(arguments) + "-ary operation");
+                return SyntaxError("Expected argument #" + std::to_string(i + 1) + " in " + typedToy->Name() + " operation");
             if (i < arguments - 1) { //not the last arguments
                 if (lex.GetNext(str, lineCount).type != COMMA)
-                    return SyntaxError("Expected comma after argument #" + std::to_string(i + 1) + " in " + std::to_string(arguments) + "-ary operation");
+                    return SyntaxError("Expected comma after argument #" + std::to_string(i + 1) + " in " + typedToy->Name() + " operation");
             }
         }
         if (lex.GetNext(str, lineCount).type != CLOSE_PARENTHESIS)
-            return SyntaxError("Expected closing parenthesis in " + std::to_string(arguments) + "-ary operation");
+            return SyntaxError("Expected closing parenthesis in " + typedToy->Name() + " operation");
         toy->AddChild(typedToy);
         return true;
     }
@@ -70,20 +70,20 @@ public:
     }
     template<typename ToyType> bool ParseExpandingSizeOperation(std::string& str, Toy* toy) {
         Lexer lex;
-        if (lex.GetNext(str, lineCount).type != OPEN_PARENTHESIS)
-            return SyntaxError("Expected opening parenthesis in expanding size operation");
         Toy* typedToy = new ToyType();
+        if (lex.GetNext(str, lineCount).type != OPEN_PARENTHESIS)
+            return SyntaxError("Expected opening parenthesis in " + typedToy->Name() + " operation");
         //at least one argument is required
         if (!Parse(str, typedToy))
-            return SyntaxError("Expected argument in expanding size operation");
+            return SyntaxError("Expected argument in "+typedToy->Name()+" operation");
 
         while (lex.PeekNext(str).type == COMMA) {
             lex.GetNext(str, lineCount); //consume comma
             if (!Parse(str, typedToy))
-                return SyntaxError("Expected argument after comma in expanding size operation");
+                return SyntaxError("Expected argument after comma in "+typedToy->Name()+" operation");
         }
         if (lex.GetNext(str, lineCount).type != CLOSE_PARENTHESIS)
-            return SyntaxError("Expected closing parenthesis in expanding size operation");
+            return SyntaxError("Expected closing parenthesis in "+typedToy->Name()+" operation");
         toy->AddChild(typedToy);
         return true;
     }

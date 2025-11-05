@@ -1,5 +1,27 @@
 Quilt for shaders. Derivative but deeper AND wider
 
+# To Do
+- [x] Display name of operations in syntax error
+- [ ] Vector math
+- [ ] Distance fields
+  - [ ] Line
+  - [ ] Rectangle
+  - [ ] Square
+  - [ ] Screen ?
+  - [ ] Circle
+  - [ ] Triangle
+- [ ] Map of AST
+- [ ] Screen UV ?
+- [ ] Useful shorthands
+  - [ ] Sobel
+  - [ ] Gaussian blur
+  - [ ] White noise
+- [ ] Example projects
+- [ ] Comment support
+  - [ ] Multi and single line
+- [ ] External textures
+  - [ ] REGEX for file path
+
 Distance fields for basic shapes: line, circle, rectangle, square(rectangle named alternative), screen (named rectangle alternative), triangle
 
 /Linear mathematical operations: divide, add, subtract, modulus, floor, ceil, round, negate
@@ -14,7 +36,7 @@ Vector math operations: dot, cross, normalize, length, distance, direction
 /A default texture just named texture 
 Other textures can specified in the variables section by referencing a file path
 
-Average function which can take any number of children (1- infinity)
+/Average function which can take any number of children 
 
 Shorthand for useful functions: sobel, gaussian, noise, 
 
