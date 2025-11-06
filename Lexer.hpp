@@ -16,6 +16,8 @@ const TokenType
     OPERATOR{"Mathematical Operator", std::regex("^[+-/*]")},
     AXIS{"Axis", std::regex("^\\.[xyzwrgbastpquv]", std::regex::icase)},
     EOI{"END OF INPUT", std::regex("\\b\\B")},
+    LINE_COMMENT{"Line comment", std::regex("^\\/\\/.*\\n")},
+    MULTI_LINE_COMMENT{"Multi or inline comment", std::regex("^\\/\\*(.|\\n)*\\*\\/")},
     ERROR{"UNKNOWN SYMBOL", std::regex("\\b\\B")};
 
 // List of tokens which are checked against
@@ -44,10 +46,19 @@ public:
 
     if (str.length() == 0) return {EOI, "Empty String"};    
 
+    if (std::regex_search(str, match, MULTI_LINE_COMMENT.pattern)) {
+        str = str.substr(match[0].length());
+        return GetNext(str, _lineCount);
+    }
+    if (std::regex_search(str, match, LINE_COMMENT.pattern)) {
+        str = str.substr(match[0].length());
+        return GetNext(str, _lineCount);
+    }
+
     DEBUG("Current string: ", str);
     for (TokenType tt : TokenTypes) {
       if (std::regex_search(str, match, tt.pattern)) {
-        std::string found = match[0].str();        
+        std::string found = match[0].str();
         std::transform(found.begin(), found.end(), found.begin(), ::tolower);
         DEBUG("Found: ", tt.name);
         str = str.substr(found.length());

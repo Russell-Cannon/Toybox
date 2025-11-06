@@ -17,7 +17,7 @@ Quilt for shaders. Derivative but deeper AND wider
   - [ ] Gaussian blur
   - [ ] White noise
 - [ ] Example projects
-- [ ] Comment support
+- [x] Comment support
   - [ ] Multi and single line
 - [ ] External textures
   - [ ] REGEX for file path

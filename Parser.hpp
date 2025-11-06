@@ -50,8 +50,9 @@ public:
             if (!Parse(str, typedToy))
                 return SyntaxError("Expected argument #" + std::to_string(i + 1) + " in " + typedToy->Name() + " operation");
             if (i < arguments - 1) { //not the last arguments
-                if (lex.GetNext(str, lineCount).type != COMMA)
-                    return SyntaxError("Expected comma after argument #" + std::to_string(i + 1) + " in " + typedToy->Name() + " operation");
+                TokenType next = lex.GetNext(str, lineCount).type;
+                if (next != COMMA)
+                    return SyntaxError("Expected comma after argument #" + std::to_string(i + 1) + " in " + typedToy->Name() + " operation. Received: " + next.name + " instead.");
             }
         }
         if (lex.GetNext(str, lineCount).type != CLOSE_PARENTHESIS)
