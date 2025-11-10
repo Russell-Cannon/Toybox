@@ -6,11 +6,9 @@ Quilt for shaders. Derivative but deeper AND wider
 - [ ] Vector math
 - [ ] Distance fields
   - [ ] Line
-  - [ ] Rectangle
-  - [ ] Square
   - [ ] Screen ?
   - [ ] Circle
-  - [ ] Triangle
+  - [x] Regular Polygons
 - [-] Map of AST
 - [ ] Useful shorthands
   - [ ] Sobel

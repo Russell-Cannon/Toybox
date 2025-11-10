@@ -55,8 +55,10 @@ public:
                     return SyntaxError("Expected comma after argument #" + std::to_string(i + 1) + " in " + typedToy->Name() + " operation. Received: " + next.name + " instead.");
             }
         }
-        if (lex.GetNext(str, lineCount).type != CLOSE_PARENTHESIS)
-            return SyntaxError("Expected closing parenthesis in " + typedToy->Name() + " operation");
+
+        Token next = lex.GetNext(str, lineCount);
+        if (next.type != CLOSE_PARENTHESIS)
+            return SyntaxError("Expected closing parenthesis in " + typedToy->Name() + " operation. Found " + next.type.name + " instead.");
         toy->AddChild(typedToy);
         return true;
     }
@@ -126,7 +128,11 @@ bool ParseToy(std::string& str, Toy* toy) {
             return ParseUnaryOperation<Y>(str, toy);
         } else if (next.value == "z") {
             return ParseUnaryOperation<Z>(str, toy);
-        } else if (next.value == "mul" || next.value == "mult" || next.value == "multiply") {
+        } else if (next.value == "screen") {
+            return ParseUnaryOperation<Screen>(str, toy);
+        } 
+        
+        else if (next.value == "mul" || next.value == "mult" || next.value == "multiply") {
             return ParseBinaryOperation<Multiply>(str, toy);
         } else if (next.value == "div" || next.value == "divide") {
             return ParseBinaryOperation<Divide>(str, toy);
@@ -138,7 +144,11 @@ bool ParseToy(std::string& str, Toy* toy) {
             return ParseBinaryOperation<Modulus>(str, toy);
         } else if (next.value == "step" || next.value == "if") {
             return ParseBinaryOperation<Step>(str, toy);
-        } else if (next.value == "com" || next.value == "comb" || next.value == "combine") {
+        } else if (next.value == "polygon" || next.value == "poly") {
+            return ParseBinaryOperation<NGon>(str, toy);
+        }
+
+        else if (next.value == "com" || next.value == "comb" || next.value == "combine") {
             return ParseTrinaryOperation<Combine>(str, toy);
         } else if (next.value == "clamp") {
             return ParseTrinaryOperation<Clamp>(str, toy);

@@ -143,6 +143,14 @@ class Z : public Unary {
         return "vec3(" + children[0]->GenerateGLSL() + ".z)";
     }
 };
+class Screen : public Unary {
+    std::string Name() { return "Screen Distance Field"; }
+    std::string GenerateGLSL() {
+        Unary::GenerateGLSL();
+        std::string st = "abs(mix(vec2(-1.0), vec2(1.0), " + children[0]->GenerateGLSL() + ".xy))";
+        return "vec3(fract(1.0 - max(" + st + ".x, " + st + ".y)))";
+    }
+};
 
 ////Binary
 class Binary : public Toy {
@@ -201,6 +209,17 @@ class Step : public Binary {
         return "step(" + children[0]->GenerateGLSL() + ", " + children[1]->GenerateGLSL() + ")";
     }
 };
+class NGon : public Binary {
+    std::string Name() {return "N-Gon";}
+    std::string GenerateGLSL() {
+        Binary::GenerateGLSL();
+        std::string st = "((" + children[0]->GenerateGLSL() /*UV*/ + " * 2.0 - 1.0).xy)";
+        std::string a = "(atan(" + st + ".x, " + st + ".y) + PI)";
+        std::string r = "(TWO_PI/" + children[1]->GenerateGLSL() /*N*/ + ")";
+        return "vec3(cos(floor(.5+" + a + "/" + r + ")*" + r + "-" + a + ")*length(" + st + "))";
+    }
+};
+
 ////Trinary
 class Trinary : public Toy {
 public:
