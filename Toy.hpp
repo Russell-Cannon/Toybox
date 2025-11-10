@@ -213,6 +213,7 @@ class NGon : public Binary {
     std::string Name() {return "N-Gon";}
     std::string GenerateGLSL() {
         Binary::GenerateGLSL();
+        //Credit https://thebookofshaders.com/07/ for the code to make regular polygons using polar functions
         std::string st = "((" + children[0]->GenerateGLSL() /*UV*/ + " * 2.0 - 1.0).xy)";
         std::string a = "(atan(" + st + ".x, " + st + ".y) + PI)";
         std::string r = "(TWO_PI/" + children[1]->GenerateGLSL() /*N*/ + ")";
