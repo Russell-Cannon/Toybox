@@ -5,9 +5,9 @@ Quilt for shaders. Derivative but deeper AND wider
 - [x] Display name of operations in syntax error
 - [ ] Vector math
 - [ ] Distance fields
-  - [ ] Line
+  - [x] Line
   - [x] Screen
-  - [ ] Circle
+  - [x] Circle
   - [x] Regular Polygons
 - [x] Map of AST
 - [ ] Useful shorthands

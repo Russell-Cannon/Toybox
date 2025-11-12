@@ -227,6 +227,15 @@ class NGon : public Binary {
         return "vec3(cos(floor(.5+" + a + "/" + r + ")*" + r + "-" + a + ")*length(" + st + "))";
     }
 };
+class Circle : public Binary {
+    std::string Name() { return "Circular Distance Field"; }
+    std::string GenerateGLSL() {
+        Binary::GenerateGLSL();
+        std::string uv = children[0]->GenerateGLSL();
+        std::string point = children[1]->GenerateGLSL();
+        return "vec3(length("+point+".xy - "+uv+".xy)*2.0)";
+    }
+};
 
 ////Trinary
 class Trinary : public Toy {
@@ -300,20 +309,24 @@ protected:
 class LineSegment : public Line {
     std::string Name() {return "Line Segment";}
     std::string GenerateGLSL() {
-        std::string d = Line::GenerateGLSL() + ".x";        
+        //generate the distance field for a line, using the base line class
+        std::string d = Line::GenerateGLSL() + ".x"; 
+
+        //fetch parameters, again
         std::string uv = children[0]->GenerateGLSL() + ".xy";
         std::string p1 = children[1]->GenerateGLSL() + ".xy";
         std::string p2 = children[2]->GenerateGLSL() + ".xy";
 
-        // std::string mask = "1.0";
-
-        std::string mask = "(   step(  0.0, dot( normalize("+p1+" - "+p2+"), normalize("+uv+" - "+p2+") )  )";
-        mask += "* step(0.0, dot(normalize("+p2+" - "+p1+"), normalize("+uv+" - "+p1+")))   )";
-
-        std::string dp1 = "length("+p1+" - "+uv+") * 2.0";
-        std::string dp2 = "length("+p2+" - "+uv+") * 2.0";
+        //create a mask to clip the ends of the line off
+        std::string mask = "(step(0.0, dot( normalize("+p1+" - "+p2+"), normalize("+uv+" - "+p2+")))";
+        mask += "* step(0.0, dot(normalize("+p2+" - "+p1+"), normalize("+uv+" - "+p1+"))))";
         d = "(" + d + "*"+mask+" + (1.0 - "+mask+"))";
 
+        //create two dots at either end of the line to make end caps
+        std::string dp1 = "length("+p1+" - "+uv+") * 2.0";
+        std::string dp2 = "length("+p2+" - "+uv+") * 2.0";
+
+        //Min everything together
         return "vec3(min(min("+dp1+", "+d+"), "+dp2+"))";
     }
 };

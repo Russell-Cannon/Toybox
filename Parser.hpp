@@ -151,6 +151,8 @@ bool ParseToy(std::string& str, Toy* toy) {
             return ParseBinaryOperation<Step>(str, toy);
         } else if (next.value == "polygon" || next.value == "poly") {
             return ParseBinaryOperation<NGon>(str, toy);
+        } else if (next.value == "circle") {
+            return ParseBinaryOperation<Circle>(str, toy);
         }
 
         else if (next.value == "com" || next.value == "comb" || next.value == "combine") {
