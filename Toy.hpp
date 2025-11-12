@@ -58,25 +58,46 @@ class Fract : public Unary {
         return "fract("+children[0]->GenerateGLSL()+")";
     }
 };
+class SawTooth : public Unary {
+    std::string Name() {return "Saw Tooth (Reflect)";}
+    std::string GenerateGLSL() {
+        Unary::GenerateGLSL();
+        return "(1.0 - abs(fract("+children[0]->GenerateGLSL()+"*0.5)*2.0-1.0))";
+    }
+};
 class Sin : public Unary {
-    std::string Name() {return "Sin";}
+    std::string Name() {return "Sine";}
     std::string GenerateGLSL() {
         Unary::GenerateGLSL();
         return "sin("+children[0]->GenerateGLSL()+")";
     }
 };
 class Cos : public Unary {
-    std::string Name() {return "Cos";}
+    std::string Name() {return "Cosine";}
     std::string GenerateGLSL() {
         Unary::GenerateGLSL();
         return "cos("+children[0]->GenerateGLSL()+")";
     }
 };
 class Tan : public Unary {
-    std::string Name() {return "Tan";}
+    std::string Name() {return "Tangent";}
     std::string GenerateGLSL() {
         Unary::GenerateGLSL();
         return "tan("+children[0]->GenerateGLSL()+")";
+    }
+};
+class Normalize : public Unary {
+    std::string Name() {return "Normalize";}
+    std::string GenerateGLSL() {
+        Unary::GenerateGLSL();
+        return "normalize("+children[0]->GenerateGLSL()+")";
+    }
+};
+class Length : public Unary {
+    std::string Name() {return "Length";}
+    std::string GenerateGLSL() {
+        Unary::GenerateGLSL();
+        return "vec3(length("+children[0]->GenerateGLSL()+"))";
     }
 };
 class Texture : public Unary {
@@ -151,6 +172,14 @@ class Screen : public Unary {
         return "vec3(fract(1.0 - max(" + st + ".x, " + st + ".y)))";
     }
 };
+class Random : public Unary {
+    std::string Name() { return "Random Hash"; }
+    std::string GenerateGLSL() {
+        Unary::GenerateGLSL();
+        std::string seed = children[0]->GenerateGLSL();
+        return "vec3(hash("+seed+".xy + vec2("+seed+".z)))";
+    }
+};
 
 ////Binary
 class Binary : public Toy {
@@ -202,6 +231,35 @@ class Modulus : public Binary {
         return "mod(" + children[0]->GenerateGLSL() + ", " + children[1]->GenerateGLSL() + ")";
     }
 };
+class Dot : public Binary {
+    std::string Name() {return "Dot Product";}
+    std::string GenerateGLSL() {
+        Binary::GenerateGLSL();
+        return "vec3(dot("+children[0]->GenerateGLSL()+", "+children[1]->GenerateGLSL()+"))";
+    }
+};
+class Cross : public Binary {
+    std::string Name() {return "Cross Product";}
+    std::string GenerateGLSL() {
+        Binary::GenerateGLSL();
+        return "cross("+children[0]->GenerateGLSL()+", "+children[1]->GenerateGLSL()+")";
+    }
+};
+class Distance : public Binary {
+    std::string Name() {return "Distance Between";}
+    std::string GenerateGLSL() {
+        Binary::GenerateGLSL();
+        return "vec3(length("+children[0]->GenerateGLSL()+" - "+children[1]->GenerateGLSL()+"))";
+    }
+};
+class Direction : public Binary {
+    std::string Name() {return "Direction From A to B";}
+    std::string GenerateGLSL() {
+        Binary::GenerateGLSL();
+        return "normalize("+children[1]->GenerateGLSL()+" - "+children[0]->GenerateGLSL()+")";
+    }
+};
+
 class Step : public Binary {
     std::string Name() {return "Step";}
     std::string GenerateGLSL() {
@@ -218,6 +276,15 @@ class NGon : public Binary {
         std::string a = "(atan(" + st + ".x, " + st + ".y) + PI)";
         std::string r = "(TWO_PI/" + children[1]->GenerateGLSL() /*N*/ + ")";
         return "vec3(cos(floor(.5+" + a + "/" + r + ")*" + r + "-" + a + ")*length(" + st + "))";
+    }
+};
+class Circle : public Binary {
+    std::string Name() { return "Circular Distance Field"; }
+    std::string GenerateGLSL() {
+        Binary::GenerateGLSL();
+        std::string uv = children[0]->GenerateGLSL();
+        std::string point = children[1]->GenerateGLSL();
+        return "vec3(length("+point+".xy - "+uv+".xy)*2.0)";
     }
 };
 
@@ -267,6 +334,51 @@ class SmoothStep : public Trinary {
     std::string GenerateGLSL() {
         Trinary::GenerateGLSL();
         return "smoothstep(" + children[0]->GenerateGLSL() + ", " + children[1]->GenerateGLSL() + ", " + children[2]->GenerateGLSL() + ")";
+    }
+};
+class Line : public Trinary {
+    std::string Name() {return "Line";}
+protected:
+    std::string GenerateGLSL() {
+        Trinary::GenerateGLSL();
+        //Credit https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line#Line_defined_by_an_equation for equation
+
+        std::string uv = children[0]->GenerateGLSL();
+        std::string p1 = children[1]->GenerateGLSL();
+        std::string p2 = children[2]->GenerateGLSL();
+
+        std::string x0 = "(" + uv + ").x";
+        std::string y0 = "(" + uv + ").y";
+        std::string x1 = "(" + p1 + ").x";
+        std::string y1 = "(" + p1 + ").y";
+        std::string x2 = "(" + p2 + ").x";
+        std::string y2 = "(" + p2 + ").y";
+
+        return "vec3(abs(("+y2+" - "+y1+")*"+x0+" - ("+x2+" - "+x1+")*"+y0+" + "+x2+"*"+y1+" - "+y2+"*"+x1+")/length("+p2+" - "+p1+")*2.0)";
+    }
+};
+class LineSegment : public Line {
+    std::string Name() {return "Line Segment";}
+    std::string GenerateGLSL() {
+        //generate the distance field for a line, using the base line class
+        std::string d = Line::GenerateGLSL() + ".x"; 
+
+        //fetch parameters, again
+        std::string uv = children[0]->GenerateGLSL() + ".xy";
+        std::string p1 = children[1]->GenerateGLSL() + ".xy";
+        std::string p2 = children[2]->GenerateGLSL() + ".xy";
+
+        //create a mask to clip the ends of the line off
+        std::string mask = "(step(0.0, dot( normalize("+p1+" - "+p2+"), normalize("+uv+" - "+p2+")))";
+        mask += "* step(0.0, dot(normalize("+p2+" - "+p1+"), normalize("+uv+" - "+p1+"))))";
+        d = "(" + d + "*"+mask+" + (1.0 - "+mask+"))";
+
+        //create two dots at either end of the line to make end caps
+        std::string dp1 = "length("+p1+" - "+uv+") * 2.0";
+        std::string dp2 = "length("+p2+" - "+uv+") * 2.0";
+
+        //Min everything together
+        return "vec3(min(min("+dp1+", "+d+"), "+dp2+"))";
     }
 };
 

@@ -107,12 +107,18 @@ bool ParseToy(std::string& str, Toy* toy) {
             return true;
         } else if (next.value == "frac" || next.value == "fract" || next.value == "fraction" || next.value == "remainder") {
             return ParseUnaryOperation<Fract>(str, toy);
+        } else if (next.value == "saw" || next.value == "sawtooth" || next.value == "mirror") {
+            return ParseUnaryOperation<SawTooth>(str, toy);
         } else if (next.value == "sin") {
             return ParseUnaryOperation<Sin>(str, toy);
         } else if (next.value == "cos") {
             return ParseUnaryOperation<Cos>(str, toy);
         } else if (next.value == "tan") {
             return ParseUnaryOperation<Tan>(str, toy);
+        } else if (next.value == "normalize" || next.value == "normalized" || next.value == "normal") {
+            return ParseUnaryOperation<Normalize>(str, toy);
+        } else if (next.value == "length" || next.value == "magnitude" || next.value == "len") {
+            return ParseUnaryOperation<Length>(str, toy);
         } else if (next.value == "text" || next.value == "texture") {
             return ParseUnaryOperation<Texture>(str, toy);
         } else if (next.value == "ceil" || next.value == "ceiling") {
@@ -133,6 +139,8 @@ bool ParseToy(std::string& str, Toy* toy) {
             return ParseUnaryOperation<Z>(str, toy);
         } else if (next.value == "screen") {
             return ParseUnaryOperation<Screen>(str, toy);
+        } else if (next.value == "random" || next.value == "rand") {
+            return ParseUnaryOperation<Random>(str, toy);
         } 
         
         else if (next.value == "mul" || next.value == "mult" || next.value == "multiply") {
@@ -149,6 +157,16 @@ bool ParseToy(std::string& str, Toy* toy) {
             return ParseBinaryOperation<Step>(str, toy);
         } else if (next.value == "polygon" || next.value == "poly") {
             return ParseBinaryOperation<NGon>(str, toy);
+        } else if (next.value == "dot") {
+            return ParseBinaryOperation<Dot>(str, toy);
+        } else if (next.value == "cross") {
+            return ParseBinaryOperation<Cross>(str, toy);
+        } else if (next.value == "distance" || next.value == "dist") {
+            return ParseBinaryOperation<Distance>(str, toy);
+        } else if (next.value == "direction" || next.value == "dir") {
+            return ParseBinaryOperation<Direction>(str, toy);
+        } else if (next.value == "circle") {
+            return ParseBinaryOperation<Circle>(str, toy);
         }
 
         else if (next.value == "com" || next.value == "comb" || next.value == "combine") {
@@ -159,6 +177,10 @@ bool ParseToy(std::string& str, Toy* toy) {
             return ParseTrinaryOperation<Mix>(str, toy);
         } else if (next.value == "smoothstep") {
             return ParseTrinaryOperation<SmoothStep>(str, toy);
+        } else if (next.value == "line") {
+            return ParseTrinaryOperation<Line>(str, toy);
+        } else if (next.value == "linesegment" || next.value == "segment") {
+            return ParseTrinaryOperation<LineSegment>(str, toy);
         } else if (next.value == "avg" || next.value == "average") {
             return ParseExpandingSizeOperation<Average>(str, toy);
         } else 
