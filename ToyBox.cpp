@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
   } else {
     std::cout << "Enter file name: ";
     filename = "first.tb"; // fix on release
-    std::cin >> filename;
+    // std::cin >> filename;
   }
   fin.open(filename);
   

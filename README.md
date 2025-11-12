@@ -1,15 +1,14 @@
 Quilt for shaders. Derivative but deeper AND wider
 
 # To Do
+
 - [x] Display name of operations in syntax error
 - [ ] Vector math
 - [ ] Distance fields
   - [ ] Line
-  - [ ] Rectangle
-  - [ ] Square
-  - [ ] Screen ?
+  - [x] Screen
   - [ ] Circle
-  - [ ] Triangle
+  - [x] Regular Polygons
 - [x] Map of AST
 - [ ] Useful shorthands
   - [ ] Sobel
@@ -30,14 +29,14 @@ Distance fields for basic shapes: line, circle, rectangle, square(rectangle name
 
 /GL operations: lerp, mix, smooth step, step, clamp
 
-Vector math operations: dot, cross, normalize, length, distance, direction 
+Vector math operations: dot, cross, normalize, length, distance, direction
 
-/A default texture just named texture 
+/A default texture just named texture
 Other textures can specified in the variables section by referencing a file path
 
-/Average function which can take any number of children 
+/Average function which can take any number of children
 
-Shorthand for useful functions: sobel, gaussian, noise, 
+Shorthand for useful functions: sobel, gaussian, noise,
 
 /Swizzling
 /Make a 'combine' function which takes a parameter for each axis
@@ -50,6 +49,5 @@ Roal Dalh filter
 Mandelbrot set
 Waving flag
 
-Also: 
+Also:
 some way to record or screenshot the page in browser (stretch)
-

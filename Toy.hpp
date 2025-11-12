@@ -41,141 +41,120 @@ public:
 
 //Operations
 ////Unary
-class Fract : public Toy {
-    std::string Name() {return "Fact";}
+class Unary : public Toy {
+public:
     std::string GenerateGLSL() {
         if (children.empty()) {
             std::cerr << Name() << " generated with no children\n";
             AddChild(new LitError());
         }
+        return "";
+    }
+};
+class Fract : public Unary {
+    std::string Name() {return "Fact";}
+    std::string GenerateGLSL() {
+        Unary::GenerateGLSL();
         return "fract("+children[0]->GenerateGLSL()+")";
     }
 };
-class Sin : public Toy {
+class Sin : public Unary {
     std::string Name() {return "Sin";}
     std::string GenerateGLSL() {
-        if (children.empty()) {
-            std::cerr << Name() << " generated with no children\n";
-            AddChild(new LitError());
-        }
+        Unary::GenerateGLSL();
         return "sin("+children[0]->GenerateGLSL()+")";
     }
 };
-class Cos : public Toy {
+class Cos : public Unary {
     std::string Name() {return "Cos";}
     std::string GenerateGLSL() {
-        if (children.empty()) {
-            std::cerr << Name() << " generated with no children\n";
-            AddChild(new LitError());
-        }
+        Unary::GenerateGLSL();
         return "cos("+children[0]->GenerateGLSL()+")";
     }
 };
-class Tan : public Toy {
+class Tan : public Unary {
     std::string Name() {return "Tan";}
     std::string GenerateGLSL() {
-        if (children.empty()) {
-            std::cerr << Name() << " generated with no children\n";
-            AddChild(new LitError());
-        }
+        Unary::GenerateGLSL();
         return "tan("+children[0]->GenerateGLSL()+")";
     }
 };
-class Texture : public Toy {
+class Texture : public Unary {
     std::string Name() {return "Texture";}
     std::string GenerateGLSL() {
-        if (children.empty()) {
-            std::cerr << Name() << " generated with no children\n";
-            AddChild(new LitError());
-        }
+        Unary::GenerateGLSL();
         std::string childOutput = children[0]->GenerateGLSL();
         return "texture(u_texture, vec2(" + childOutput + ".x, -" + childOutput + ".y)).xyz";
     }
 };
-class Ceiling : public Toy {
+class Ceiling : public Unary {
     std::string Name() {return "Ceiling";}
     std::string GenerateGLSL() {
-        if (children.empty()) {
-            std::cerr << Name() << " generated with no children\n";
-            AddChild(new LitError());
-        }
+        Unary::GenerateGLSL();
         return "ceil(" + children[0]->GenerateGLSL() + ")";
     }
 };
-class Floor : public Toy {
+class Floor : public Unary {
     std::string Name() {return "Floor";}
     std::string GenerateGLSL() {
-        if (children.empty()) {
-            std::cerr << Name() << " generated with no children\n";
-            AddChild(new LitError());
-        }
+        Unary::GenerateGLSL();
         return "floor(" + children[0]->GenerateGLSL() + ")";
     }
 };
-class Round : public Toy {
+class Round : public Unary {
     std::string Name() {return "Round";}
     std::string GenerateGLSL() {
-        if (children.empty()) {
-            std::cerr << Name() << " generated with no children\n";
-            AddChild(new LitError());
-        }
+        Unary::GenerateGLSL();
         return "round(" + children[0]->GenerateGLSL() + ")";
     }
 };
-class Negate : public Toy {
+class Negate : public Unary {
     std::string Name() {return "Negate";}
     std::string GenerateGLSL() {
-        if (children.empty()) {
-            std::cerr << Name() << " generated with no children\n";
-            AddChild(new LitError());
-        }
+        Unary::GenerateGLSL();
         return "(-" + children[0]->GenerateGLSL() + ")";
     }
 };
-class Absolute : public Toy {
+class Absolute : public Unary {
     std::string Name() {return "Absolute";}
     std::string GenerateGLSL() {
-        if (children.empty()) {
-            std::cerr << Name() << " generated with no children\n";
-            AddChild(new LitError());
-        }
+        Unary::GenerateGLSL();
         return "abs(" + children[0]->GenerateGLSL() + ")";
     }
 };
-class X : public Toy {
+class X : public Unary {
     std::string Name() {return "X";}
     std::string GenerateGLSL() {
-        if (children.empty()) {
-            std::cerr << Name() << " generated with no children\n";
-            AddChild(new LitError());
-        }
+        Unary::GenerateGLSL();
         return "vec3(" + children[0]->GenerateGLSL() + ".x)";
     }
 };
-class Y : public Toy {
+class Y : public Unary {
     std::string Name() {return "Y";}
     std::string GenerateGLSL() {
-        if (children.empty()) {
-            std::cerr << Name() << " generated with no children\n";
-            AddChild(new LitError());
-        }
+        Unary::GenerateGLSL();
         return "vec3(" + children[0]->GenerateGLSL() + ".y)";
     }
 };
-class Z : public Toy {
+class Z : public Unary {
     std::string Name() {return "Z";}
     std::string GenerateGLSL() {
-        if (children.empty()) {
-            std::cerr << Name() << " generated with no children\n";
-            AddChild(new LitError());
-        }
+        Unary::GenerateGLSL();
         return "vec3(" + children[0]->GenerateGLSL() + ".z)";
+    }
+};
+class Screen : public Unary {
+    std::string Name() { return "Screen Distance Field"; }
+    std::string GenerateGLSL() {
+        Unary::GenerateGLSL();
+        std::string st = "abs(mix(vec2(-1.0), vec2(1.0), " + children[0]->GenerateGLSL() + ".xy))";
+        return "vec3(fract(1.0 - max(" + st + ".x, " + st + ".y)))";
     }
 };
 
 ////Binary
-class Multiply : public Toy {
-    std::string Name() {return "Multiply";}
+class Binary : public Toy {
+public:
     std::string GenerateGLSL() {
         if (children.empty()) {
             std::cerr << Name() << " generated with no children\n";
@@ -185,82 +164,66 @@ class Multiply : public Toy {
             std::cerr << Name() << "generated with only one child\n";
             AddChild(new LitError());
         }
+        return "";
+    }
+};
+class Multiply : public Binary {
+    std::string Name() {return "Multiply";}
+    std::string GenerateGLSL() {
+        Binary::GenerateGLSL();
         return "(" + children[0]->GenerateGLSL() + " * " + children[1]->GenerateGLSL() + ")";
     }
 };
-class Divide : public Toy {
+class Divide : public Binary {
     std::string Name() {return "Divide";}
     std::string GenerateGLSL() {
-        if (children.empty()) {
-            std::cerr << Name() << " generated with no children\n";
-            AddChild(new LitError());
-            AddChild(new LitError());
-        } else if (children.size() == 1) {
-            std::cerr << Name() << "generated with only one child\n";
-            AddChild(new LitError());
-        }
+        Binary::GenerateGLSL();
         return "(" + children[0]->GenerateGLSL() + " / " +children[1]->GenerateGLSL() + ")";
     }
 };
-class Add : public Toy {
+class Add : public Binary {
     std::string Name() {return "Add";}
     std::string GenerateGLSL() {
-        if (children.empty()) {
-            std::cerr << Name() << " generated with no children\n";
-            AddChild(new LitError());
-            AddChild(new LitError());
-        } else if (children.size() == 1) {
-            std::cerr << Name() << "generated with only one child\n";
-            AddChild(new LitError());
-        }
+        Binary::GenerateGLSL();
         return "(" + children[0]->GenerateGLSL() + " + "+children[1]->GenerateGLSL() + ")";
     }
 };
-class Subtract : public Toy {
+class Subtract : public Binary {
     std::string Name() {return "Subtract";}
     std::string GenerateGLSL() {
-        if (children.empty()) {
-            std::cerr << Name() << " generated with no children\n";
-            AddChild(new LitError());
-            AddChild(new LitError());
-        } else if (children.size() == 1) {
-            std::cerr << Name() << "generated with only one child\n";
-            AddChild(new LitError());
-        }
+        Binary::GenerateGLSL();
         return "(" + children[0]->GenerateGLSL() + " - " + children[1]->GenerateGLSL() + ")";
     }
 };
-class Modulus : public Toy {
+class Modulus : public Binary {
     std::string Name() {return "Modulus";}
     std::string GenerateGLSL() {
-        if (children.empty()) {
-            std::cerr << Name() << " generated with no children\n";
-            AddChild(new LitError());
-            AddChild(new LitError());
-        } else if (children.size() == 1) {
-            std::cerr << Name() << "generated with only one child\n";
-            AddChild(new LitError());
-        }
+        Binary::GenerateGLSL();
         return "mod(" + children[0]->GenerateGLSL() + ", " + children[1]->GenerateGLSL() + ")";
     }
 };
-class Step : public Toy {
+class Step : public Binary {
     std::string Name() {return "Step";}
     std::string GenerateGLSL() {
-        if (children.empty()) {
-            std::cerr << Name() << " generated with no children\n";
-            AddChild(new LitError());
-            AddChild(new LitError());
-        } else if (children.size() == 1) {
-            std::cerr << Name() << "generated with only one child\n";
-            AddChild(new LitError());
-        }
+        Binary::GenerateGLSL();
         return "step(" + children[0]->GenerateGLSL() + ", " + children[1]->GenerateGLSL() + ")";
     }
 };
+class NGon : public Binary {
+    std::string Name() {return "N-Gon";}
+    std::string GenerateGLSL() {
+        Binary::GenerateGLSL();
+        //Credit https://thebookofshaders.com/07/ for the code to make regular polygons using polar functions
+        std::string st = "((" + children[0]->GenerateGLSL() /*UV*/ + " * 2.0 - 1.0).xy)";
+        std::string a = "(atan(" + st + ".x, " + st + ".y) + PI)";
+        std::string r = "(TWO_PI/" + children[1]->GenerateGLSL() /*N*/ + ")";
+        return "vec3(cos(floor(.5+" + a + "/" + r + ")*" + r + "-" + a + ")*length(" + st + "))";
+    }
+};
+
 ////Trinary
-class Combine : public Toy {
-    std::string Name() {return "Combine";}
+class Trinary : public Toy {
+public:
     std::string GenerateGLSL() {
         if (children.empty()) {
             std::cerr << Name() << " generated with no children\n";
@@ -275,66 +238,38 @@ class Combine : public Toy {
             AddChild(new LitError());
             AddChild(new LitError());
         }
+        return "";
+    }
+};
+class Combine : public Trinary {
+    std::string Name() {return "Combine";}
+    std::string GenerateGLSL() {
+        Trinary::GenerateGLSL();
         return "vec3(" + children[0]->GenerateGLSL() + ".x, " + children[1]->GenerateGLSL() + ".y, " + children[2]->GenerateGLSL() + ".z)";
     }
 };
-class Clamp : public Toy {
+class Clamp : public Trinary {
     std::string Name() {return "Clamp";}
     std::string GenerateGLSL() {
-        if (children.empty()) {
-            std::cerr << Name() << " generated with no children\n";
-            AddChild(new LitError());
-            AddChild(new LitError());
-            AddChild(new LitError());
-        } else if (children.size() == 2) {
-            std::cerr << Name() << " generated only two children\n";
-            AddChild(new LitError());
-        } else if (children.size() == 1) {
-            std::cerr << Name() << "generated with only one child\n";
-            AddChild(new LitError());
-            AddChild(new LitError());
-        }
+        Trinary::GenerateGLSL();
         return "clamp(" + children[0]->GenerateGLSL() + ", " + children[1]->GenerateGLSL() + ", " + children[2]->GenerateGLSL() + ")";
     }
 };
-class Mix : public Toy {
+class Mix : public Trinary {
     std::string Name() {return "Mix";}
     std::string GenerateGLSL() {
-        if (children.empty()) {
-            std::cerr << Name() << " generated with no children\n";
-            AddChild(new LitError());
-            AddChild(new LitError());
-            AddChild(new LitError());
-        } else if (children.size() == 2) {
-            std::cerr << Name() << " generated only two children\n";
-            AddChild(new LitError());
-        } else if (children.size() == 1) {
-            std::cerr << Name() << "generated with only one child\n";
-            AddChild(new LitError());
-            AddChild(new LitError());
-        }
+        Trinary::GenerateGLSL();
         return "mix(" + children[0]->GenerateGLSL() + ", " + children[1]->GenerateGLSL() + ", " + children[2]->GenerateGLSL() + ")";
     }
 };
-class SmoothStep : public Toy {
+class SmoothStep : public Trinary {
     std::string Name() {return "SmoothStep";}
     std::string GenerateGLSL() {
-        if (children.empty()) {
-            std::cerr << Name() << " generated with no children\n";
-            AddChild(new LitError());
-            AddChild(new LitError());
-            AddChild(new LitError());
-        } else if (children.size() == 2) {
-            std::cerr << Name() << " generated only two children\n";
-            AddChild(new LitError());
-        } else if (children.size() == 1) {
-            std::cerr << Name() << "generated with only one child\n";
-            AddChild(new LitError());
-            AddChild(new LitError());
-        }
+        Trinary::GenerateGLSL();
         return "smoothstep(" + children[0]->GenerateGLSL() + ", " + children[1]->GenerateGLSL() + ", " + children[2]->GenerateGLSL() + ")";
     }
 };
+
 //n-ary
 class Average : public Toy {
     std::string Name() {return "Average";}
