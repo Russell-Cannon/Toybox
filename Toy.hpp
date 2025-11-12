@@ -276,6 +276,47 @@ class SmoothStep : public Trinary {
         return "smoothstep(" + children[0]->GenerateGLSL() + ", " + children[1]->GenerateGLSL() + ", " + children[2]->GenerateGLSL() + ")";
     }
 };
+class Line : public Trinary {
+    std::string Name() {return "Line";}
+protected:
+    std::string GenerateGLSL() {
+        Trinary::GenerateGLSL();
+        //Credit https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line#Line_defined_by_an_equation for equation
+
+        std::string uv = children[0]->GenerateGLSL();
+        std::string p1 = children[1]->GenerateGLSL();
+        std::string p2 = children[2]->GenerateGLSL();
+
+        std::string x0 = "(" + uv + ").x";
+        std::string y0 = "(" + uv + ").y";
+        std::string x1 = "(" + p1 + ").x";
+        std::string y1 = "(" + p1 + ").y";
+        std::string x2 = "(" + p2 + ").x";
+        std::string y2 = "(" + p2 + ").y";
+
+        return "vec3(abs(("+y2+" - "+y1+")*"+x0+" - ("+x2+" - "+x1+")*"+y0+" + "+x2+"*"+y1+" - "+y2+"*"+x1+")/length("+p2+" - "+p1+")*2.0)";
+    }
+};
+class LineSegment : public Line {
+    std::string Name() {return "Line Segment";}
+    std::string GenerateGLSL() {
+        std::string d = Line::GenerateGLSL() + ".x";        
+        std::string uv = children[0]->GenerateGLSL() + ".xy";
+        std::string p1 = children[1]->GenerateGLSL() + ".xy";
+        std::string p2 = children[2]->GenerateGLSL() + ".xy";
+
+        // std::string mask = "1.0";
+
+        std::string mask = "(   step(  0.0, dot( normalize("+p1+" - "+p2+"), normalize("+uv+" - "+p2+") )  )";
+        mask += "* step(0.0, dot(normalize("+p2+" - "+p1+"), normalize("+uv+" - "+p1+")))   )";
+
+        std::string dp1 = "length("+p1+" - "+uv+") * 2.0";
+        std::string dp2 = "length("+p2+" - "+uv+") * 2.0";
+        d = "(" + d + "*"+mask+" + (1.0 - "+mask+"))";
+
+        return "vec3(min(min("+dp1+", "+d+"), "+dp2+"))";
+    }
+};
 
 //n-ary
 class Average : public Toy {

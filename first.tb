@@ -1,1 +1,2 @@
-saw(uv)
+ smoothstep(0.45, 0.55,linesegment(frac(uv*25), combine(.25, 0.25, 0), combine(.75, .75, 0)))
+*smoothstep(0.45, 0.55,linesegment(frac(uv*25), combine(.25, 0.75, 0), combine(.75, .25, 0)))

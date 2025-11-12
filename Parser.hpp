@@ -161,6 +161,10 @@ bool ParseToy(std::string& str, Toy* toy) {
             return ParseTrinaryOperation<Mix>(str, toy);
         } else if (next.value == "smoothstep") {
             return ParseTrinaryOperation<SmoothStep>(str, toy);
+        } else if (next.value == "line") {
+            return ParseTrinaryOperation<Line>(str, toy);
+        } else if (next.value == "linesegment" || next.value == "segment") {
+            return ParseTrinaryOperation<LineSegment>(str, toy);
         } else if (next.value == "avg" || next.value == "average") {
             return ParseExpandingSizeOperation<Average>(str, toy);
         } else 
