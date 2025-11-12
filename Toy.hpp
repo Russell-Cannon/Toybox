@@ -58,6 +58,13 @@ class Fract : public Unary {
         return "fract("+children[0]->GenerateGLSL()+")";
     }
 };
+class SawTooth : public Unary {
+    std::string Name() {return "Saw Tooth";}
+    std::string GenerateGLSL() {
+        Unary::GenerateGLSL();
+        return "(1.0 - abs(fract("+children[0]->GenerateGLSL()+"*0.5)*2.0-1.0))";
+    }
+};
 class Sin : public Unary {
     std::string Name() {return "Sin";}
     std::string GenerateGLSL() {

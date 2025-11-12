@@ -1,7 +1,1 @@
-text(
-    2*(uv + combine(
-        0, 
-        x(0.25 * (uv + 2 + sin((10*uv) + time))), 
-        0)
-    )
-)
+saw(uv)

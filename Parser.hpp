@@ -107,6 +107,8 @@ bool ParseToy(std::string& str, Toy* toy) {
             return true;
         } else if (next.value == "frac" || next.value == "fract" || next.value == "fraction" || next.value == "remainder") {
             return ParseUnaryOperation<Fract>(str, toy);
+        } else if (next.value == "saw" || next.value == "sawtooth" || next.value == "mirror") {
+            return ParseUnaryOperation<SawTooth>(str, toy);
         } else if (next.value == "sin") {
             return ParseUnaryOperation<Sin>(str, toy);
         } else if (next.value == "cos") {
