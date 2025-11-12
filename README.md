@@ -3,8 +3,14 @@ Quilt for shaders. Derivative but deeper AND wider
 # To Do
 
 - [x] Display name of operations in syntax error
-- [ ] Vector math
-- [ ] Distance fields
+- [x] Vector math
+  - [ ] Dot
+  - [ ] Cross
+  - [ ] Normalize
+  - [ ] Length
+  - [ ] Distance
+  - [ ] Direction
+- [x] Distance fields
   - [x] Line
   - [x] Screen
   - [x] Circle

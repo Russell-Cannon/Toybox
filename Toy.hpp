@@ -59,31 +59,45 @@ class Fract : public Unary {
     }
 };
 class SawTooth : public Unary {
-    std::string Name() {return "Saw Tooth";}
+    std::string Name() {return "Saw Tooth (Reflect)";}
     std::string GenerateGLSL() {
         Unary::GenerateGLSL();
         return "(1.0 - abs(fract("+children[0]->GenerateGLSL()+"*0.5)*2.0-1.0))";
     }
 };
 class Sin : public Unary {
-    std::string Name() {return "Sin";}
+    std::string Name() {return "Sine";}
     std::string GenerateGLSL() {
         Unary::GenerateGLSL();
         return "sin("+children[0]->GenerateGLSL()+")";
     }
 };
 class Cos : public Unary {
-    std::string Name() {return "Cos";}
+    std::string Name() {return "Cosine";}
     std::string GenerateGLSL() {
         Unary::GenerateGLSL();
         return "cos("+children[0]->GenerateGLSL()+")";
     }
 };
 class Tan : public Unary {
-    std::string Name() {return "Tan";}
+    std::string Name() {return "Tangent";}
     std::string GenerateGLSL() {
         Unary::GenerateGLSL();
         return "tan("+children[0]->GenerateGLSL()+")";
+    }
+};
+class Normalize : public Unary {
+    std::string Name() {return "Normalize";}
+    std::string GenerateGLSL() {
+        Unary::GenerateGLSL();
+        return "normalize("+children[0]->GenerateGLSL()+")";
+    }
+};
+class Length : public Unary {
+    std::string Name() {return "Length";}
+    std::string GenerateGLSL() {
+        Unary::GenerateGLSL();
+        return "vec3(length("+children[0]->GenerateGLSL()+"))";
     }
 };
 class Texture : public Unary {
@@ -209,6 +223,35 @@ class Modulus : public Binary {
         return "mod(" + children[0]->GenerateGLSL() + ", " + children[1]->GenerateGLSL() + ")";
     }
 };
+class Dot : public Binary {
+    std::string Name() {return "Dot Product";}
+    std::string GenerateGLSL() {
+        Binary::GenerateGLSL();
+        return "vec3(dot("+children[0]->GenerateGLSL()+", "+children[1]->GenerateGLSL()+"))";
+    }
+};
+class Cross : public Binary {
+    std::string Name() {return "Cross Product";}
+    std::string GenerateGLSL() {
+        Binary::GenerateGLSL();
+        return "cross("+children[0]->GenerateGLSL()+", "+children[1]->GenerateGLSL()+")";
+    }
+};
+class Distance : public Binary {
+    std::string Name() {return "Distance Between";}
+    std::string GenerateGLSL() {
+        Binary::GenerateGLSL();
+        return "vec3(length("+children[0]->GenerateGLSL()+" - "+children[1]->GenerateGLSL()+"))";
+    }
+};
+class Direction : public Binary {
+    std::string Name() {return "Direction From A to B";}
+    std::string GenerateGLSL() {
+        Binary::GenerateGLSL();
+        return "normalize("+children[1]->GenerateGLSL()+" - "+children[0]->GenerateGLSL()+")";
+    }
+};
+
 class Step : public Binary {
     std::string Name() {return "Step";}
     std::string GenerateGLSL() {

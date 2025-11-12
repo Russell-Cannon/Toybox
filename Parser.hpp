@@ -115,6 +115,10 @@ bool ParseToy(std::string& str, Toy* toy) {
             return ParseUnaryOperation<Cos>(str, toy);
         } else if (next.value == "tan") {
             return ParseUnaryOperation<Tan>(str, toy);
+        } else if (next.value == "normalize" || next.value == "normalized" || next.value == "normal") {
+            return ParseUnaryOperation<Normalize>(str, toy);
+        } else if (next.value == "length" || next.value == "magnitude" || next.value == "len") {
+            return ParseUnaryOperation<Length>(str, toy);
         } else if (next.value == "text" || next.value == "texture") {
             return ParseUnaryOperation<Texture>(str, toy);
         } else if (next.value == "ceil" || next.value == "ceiling") {
@@ -151,6 +155,14 @@ bool ParseToy(std::string& str, Toy* toy) {
             return ParseBinaryOperation<Step>(str, toy);
         } else if (next.value == "polygon" || next.value == "poly") {
             return ParseBinaryOperation<NGon>(str, toy);
+        } else if (next.value == "dot") {
+            return ParseBinaryOperation<Dot>(str, toy);
+        } else if (next.value == "cross") {
+            return ParseBinaryOperation<Cross>(str, toy);
+        } else if (next.value == "distance" || next.value == "dist") {
+            return ParseBinaryOperation<Distance>(str, toy);
+        } else if (next.value == "direction" || next.value == "dir") {
+            return ParseBinaryOperation<Direction>(str, toy);
         } else if (next.value == "circle") {
             return ParseBinaryOperation<Circle>(str, toy);
         }
