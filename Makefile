@@ -1,11 +1,8 @@
-ToyBox.exe:	postamble.txt	preamble.txt	Toy.hpp	Types.hpp	Lexer.hpp	Parser.hpp
-	g++ ToyBox.cpp -o ToyBox
+Toybox.exe:	in.html	Toybox.cpp	Toy.hpp	Types.hpp	Lexer.hpp	Parser.hpp
+	g++ Toybox.cpp -o Toybox
 
-run:	ToyBox.exe
-	./ToyBox first.tb
+run:	Toybox.exe
+	./Toybox first.tb
 
 clean:
-	del *.exe *.html
-
-see:	ToyBox.exe
-	./out.html
+	del *.exe out.html

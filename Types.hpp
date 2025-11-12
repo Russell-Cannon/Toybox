@@ -1,9 +1,9 @@
 #pragma once
-#include <vector>
-#include <string>
 #include <deque>
-#include <regex>
 #include <iostream>
+#include <regex>
+#include <string>
+#include <vector>
 
 #define DEBUG(MSG, VALUE)
 // #define DEBUG(MSG, VALUE) std::cout << (MSG) << (VALUE) << std::endl
@@ -11,20 +11,20 @@
 struct TokenType;
 struct Token;
 
-struct TokenType { //A token is a symbol which can be resolved using a (regex) pattern
-	std::string name;
-	std::regex pattern;
-	bool operator==(const TokenType& other) const {
-		return name == other.name;
-	}
-	bool operator!=(const TokenType& other) const {
-		return name != other.name;
-	}
+struct TokenType { // A token is a symbol which can be resolved using a (regex) pattern
+    std::string name;
+    std::regex pattern;
+    bool operator==(const TokenType& other) const {
+        return name == other.name;
+    }
+    bool operator!=(const TokenType& other) const {
+        return name != other.name;
+    }
 };
 struct Token {
-	const TokenType type;
-	std::string value;
-	std::string ToString() {
-		return type.name + ": " + value;
-	}
+    const TokenType type;
+    std::string value;
+    std::string ToString() {
+        return type.name + ": " + value;
+    }
 };

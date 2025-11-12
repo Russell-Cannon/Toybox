@@ -1,10 +1,11 @@
 #pragma once
 
 #include "Types.hpp"
+#include <cctype>
 #include <cmath>
 #include <iostream>
 #include <regex>
-#include <cctype>
+
 
 // All tokens with their names and respective patterns
 const TokenType
@@ -28,50 +29,50 @@ const TokenType TokenTypes[] = {
     COMMA,
     NUMBER,
     OPERATOR,
-    AXIS
-};
+    AXIS};
 
 class Lexer {
-public:
-  Lexer() { }
+  public:
+    Lexer() {}
 
-  Token GetNext(std::string& str, int& _lineCount) {
-    std::smatch match;
+    Token GetNext(std::string& str, int& _lineCount) {
+        std::smatch match;
 
-    while (str.length() > 0 && (str[0] == ' ' || str[0] == '\n' || str[0] == '\t')) {
-      if (str[0] == '\n')
-        _lineCount++;
-      str = str.substr(1);
+        while (str.length() > 0 && (str[0] == ' ' || str[0] == '\n' || str[0] == '\t')) {
+            if (str[0] == '\n')
+                _lineCount++;
+            str = str.substr(1);
+        }
+
+        if (str.length() == 0)
+            return {EOI, "Empty String"};
+
+        if (std::regex_search(str, match, MULTI_LINE_COMMENT.pattern)) {
+            str = str.substr(match[0].length());
+            return GetNext(str, _lineCount);
+        }
+        if (std::regex_search(str, match, LINE_COMMENT.pattern)) {
+            str = str.substr(match[0].length());
+            return GetNext(str, _lineCount);
+        }
+
+        DEBUG("Current string: ", str);
+        for (TokenType tt : TokenTypes) {
+            if (std::regex_search(str, match, tt.pattern)) {
+                std::string found = match[0].str();
+                std::transform(found.begin(), found.end(), found.begin(), ::tolower);
+                DEBUG("Found: ", tt.name);
+                str = str.substr(found.length());
+                return {tt, found};
+            }
+        }
+        std::cerr << "UNKNOWN CHARACTER: in '" << str << "'\n";
+        return {ERROR, str};
     }
 
-    if (str.length() == 0) return {EOI, "Empty String"};    
-
-    if (std::regex_search(str, match, MULTI_LINE_COMMENT.pattern)) {
-        str = str.substr(match[0].length());
-        return GetNext(str, _lineCount);
+    Token PeekNext(std::string& str) {
+        int n = 0;
+        std::string temp(str);
+        return GetNext(temp, n);
     }
-    if (std::regex_search(str, match, LINE_COMMENT.pattern)) {
-        str = str.substr(match[0].length());
-        return GetNext(str, _lineCount);
-    }
-
-    DEBUG("Current string: ", str);
-    for (TokenType tt : TokenTypes) {
-      if (std::regex_search(str, match, tt.pattern)) {
-        std::string found = match[0].str();
-        std::transform(found.begin(), found.end(), found.begin(), ::tolower);
-        DEBUG("Found: ", tt.name);
-        str = str.substr(found.length());
-        return {tt, found};
-      }
-    }
-    std::cerr << "UNKNOWN CHARACTER: in '" << str << "'\n";
-    return {ERROR, str};
-  }
-
-  Token PeekNext(std::string& str) {
-    int n = 0;
-    std::string temp(str);
-    return GetNext(temp, n);
-  }
 };
