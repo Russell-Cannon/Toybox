@@ -1,1 +1,1 @@
-dot(dir(combine(0, 0.5, 0), combine(1, 0.5, 0)), uv)
+random(uv + time)

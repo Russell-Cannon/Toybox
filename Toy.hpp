@@ -172,6 +172,14 @@ class Screen : public Unary {
         return "vec3(fract(1.0 - max(" + st + ".x, " + st + ".y)))";
     }
 };
+class Random : public Unary {
+    std::string Name() { return "Random Hash"; }
+    std::string GenerateGLSL() {
+        Unary::GenerateGLSL();
+        std::string seed = children[0]->GenerateGLSL();
+        return "vec3(hash("+seed+".xy + vec2("+seed+".z)))";
+    }
+};
 
 ////Binary
 class Binary : public Toy {

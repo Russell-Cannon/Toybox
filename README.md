@@ -4,27 +4,24 @@ Quilt for shaders. Derivative but deeper AND wider
 
 - [x] Display name of operations in syntax error
 - [x] Vector math
-  - [ ] Dot
-  - [ ] Cross
-  - [ ] Normalize
-  - [ ] Length
-  - [ ] Distance
-  - [ ] Direction
 - [x] Distance fields
-  - [x] Line
-  - [x] Screen
-  - [x] Circle
-  - [x] Regular Polygons
 - [x] Map of AST
 - [ ] Useful shorthands
   - [ ] Sobel
-  - [ ] Gaussian blur
+  - [ ] Gaussian blur ?
   - [ ] White noise
+  - [x] Random noise
 - [ ] Example projects
+  - [x] Waving flag
+  - [ ] Cross stitch
+  - [ ] Roald Dahl
+  - [ ] Mandelbrot ?
+  - [ ] Pointilism ?
 - [x] Comment support
   - [x] Multi and single line
 - [ ] External textures
   - [ ] REGEX for file path
+- [ ] Function support
 
 Distance fields for basic shapes: line, circle, rectangle, square(rectangle named alternative), screen (named rectangle alternative), triangle
 
