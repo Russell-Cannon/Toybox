@@ -180,6 +180,14 @@ class Random : public Unary {
         return "vec3(hash("+seed+".xy + vec2("+seed+".z)))";
     }
 };
+class Noise : public Unary {
+    std::string Name() { return "Simplex Noise"; }
+    std::string GenerateGLSL() {
+        Unary::GenerateGLSL();
+        std::string seed = children[0]->GenerateGLSL();
+        return "vec3((snoise("+seed+".xy + vec2("+seed+".z)) + 1.0 ) / 2.0)";
+    }
+};
 
 ////Binary
 class Binary : public Toy {

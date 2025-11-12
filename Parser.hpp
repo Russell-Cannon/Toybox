@@ -141,6 +141,8 @@ bool ParseToy(std::string& str, Toy* toy) {
             return ParseUnaryOperation<Screen>(str, toy);
         } else if (next.value == "random" || next.value == "rand") {
             return ParseUnaryOperation<Random>(str, toy);
+        } else if (next.value == "noise") {
+            return ParseUnaryOperation<Noise>(str, toy);
         } 
         
         else if (next.value == "mul" || next.value == "mult" || next.value == "multiply") {

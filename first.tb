@@ -1,1 +1,1 @@
-random(uv + time)
+noise(uv*5)

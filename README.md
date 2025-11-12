@@ -1,56 +1,28 @@
-Quilt for shaders. Derivative but deeper AND wider
+Little Quilt for GLSL
+=
+`make run`
 
 # To Do
 
-- [x] Display name of operations in syntax error
+- [x] Basic Arithmetic symbols
+  - [ ] Order of operatorations
+- [x] Swizzling
 - [x] Vector math
 - [x] Distance fields
 - [x] Map of AST
-- [ ] Useful shorthands
-  - [ ] Sobel
+- [ ] Useful built-in functions
+  - [ ] Sobel filter
   - [ ] Gaussian blur ?
-  - [ ] White noise
+  - [x] White noise
   - [x] Random noise
 - [ ] Example projects
   - [x] Waving flag
+  - [ ] CRT Filter
   - [ ] Cross stitch
   - [ ] Roald Dahl
-  - [ ] Mandelbrot ?
-  - [ ] Pointilism ?
-- [x] Comment support
-  - [x] Multi and single line
-- [ ] External textures
-  - [ ] REGEX for file path
+  - [ ] Mandelbrot set ?
 - [ ] Function support
-
-Distance fields for basic shapes: line, circle, rectangle, square(rectangle named alternative), screen (named rectangle alternative), triangle
-
-/Linear mathematical operations: divide, add, subtract, modulus, floor, ceil, round, negate
-/support these by symbol (stretch)
-
-/Trig operations: sin, cos, tan
-
-/GL operations: lerp, mix, smooth step, step, clamp
-
-Vector math operations: dot, cross, normalize, length, distance, direction
-
-/A default texture just named texture
-Other textures can specified in the variables section by referencing a file path
-
-/Average function which can take any number of children
-
-Shorthand for useful functions: sobel, gaussian, noise,
-
-/Swizzling
-/Make a 'combine' function which takes a parameter for each axis
-
-Draw a map of the tree like in Quilt
-
-Example projects:
-CRT filter
-Roal Dalh filter
-Mandelbrot set
-Waving flag
-
-Also:
-some way to record or screenshot the page in browser (stretch)
+  - Allow references to other files to be used as a sort of `val` toy.
+- [x] Comment support
+- [ ] External textures
+- [ ] Some way to record or screenshot the page in browser ?
