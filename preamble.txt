@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>ToyBox</title>
+        <title>Toybox</title>
         <style>
             html, body, canvas{
                 height:100%;
@@ -32,7 +32,7 @@
             
             // Asynchronously load an image
             var image = new Image();
-            image.src = "./checker-map.png";
+            image.src = "./cherub.jpg";
             image.addEventListener('load', function() {
                 // Now that the image has loaded make copy it to the texture.
                 gl.bindTexture(gl.TEXTURE_2D, texture);
