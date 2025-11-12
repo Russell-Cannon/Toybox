@@ -7,6 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <iomanip>
 
 class Parser {
   Document document;
@@ -39,6 +40,8 @@ public:
     preamble.close();
     fout.close();
     postamble.close();
+
+    PrintAST();
   }
 
     template<typename ToyType> bool ParseNAryOperation(std::string& str, Toy* toy, int arguments) {
@@ -223,4 +226,33 @@ bool ParseToy(std::string& str, Toy* toy) {
         return true;
     }
 
+    void PrintAST() {
+        std::cout << document.Name() << std::endl;
+        if (!document.children.empty())
+            PrintToy(document.children[0]);
+    }
+
+    void PrintToy(Toy* toy, bool last = true, std::string pre = "") {
+        const char BAR = char(179) /*│*/, MIDDLE = char(195) /*├*/, LAST = char(192) /*└*/;
+        if (pre.empty()) pre += BAR;
+
+        //if the last character is a bar, override it with MIDDLE or LAST
+        if (pre[pre.length() - 1] == BAR) {
+            std::cout << pre.substr(0, pre.length() - 1);
+        } else std::cout << pre;
+
+        // std::cout << pre;
+
+        if (last) {
+            std::cout << LAST;
+            pre = pre.substr(0, pre.length() - 1) + ' ';
+        } else
+            std::cout << MIDDLE;
+
+        std::cout << toy->Name() << std::endl;
+
+        for (int i = 0; i < toy->children.size(); i++) {
+            PrintToy(toy->children[i], i == toy->children.size() - 1, pre + BAR);
+        }
+    }
 };

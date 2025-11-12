@@ -10,15 +10,14 @@ Quilt for shaders. Derivative but deeper AND wider
   - [ ] Screen ?
   - [ ] Circle
   - [ ] Triangle
-- [ ] Map of AST
-- [ ] Screen UV ?
+- [x] Map of AST
 - [ ] Useful shorthands
   - [ ] Sobel
   - [ ] Gaussian blur
   - [ ] White noise
 - [ ] Example projects
 - [x] Comment support
-  - [ ] Multi and single line
+  - [x] Multi and single line
 - [ ] External textures
   - [ ] REGEX for file path
 

@@ -31,7 +31,7 @@ class LitTime : public Toy {
     std::string GenerateGLSL() {return "vec3(time)";}
 };
 class LitNumber : public Toy {
-    std::string Name() {return "Number";}
+    std::string Name() {return "Number (" + std::to_string(Value) + ")";}
     std::string GenerateGLSL() {
         return "vec3(" + std::to_string(Value) + ")";
     }
