@@ -6,11 +6,10 @@
 #include <iostream>
 #include <regex>
 
-
 // All tokens with their names and respective patterns
 const TokenType
     IDENTIFIER{"Identifier", std::regex("^[a-z]+", std::regex::icase)},
-    FILEPATH{"File Path", std::regex("^\\.\\.?\\/.*\\/", std::regex::icase)},
+    FILEPATH{"File Path", std::regex("^(\\.\\.?\\/)+[a-z ._-]*\\.[a-z]+", std::regex::icase)},
     OPEN_PARENTHESIS{"Open Parenthesis", std::regex("^\\(")},
     CLOSE_PARENTHESIS{"Close Parenthesis", std::regex("^\\)")},
     COMMA{"Comma", std::regex("^,")},

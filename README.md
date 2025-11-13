@@ -8,6 +8,9 @@ Toybox: Little Quilt for GLSL
 4. Enter `first.tb`
 5. out.html will have been created. Open it in a browser.
 
+## Bugs
+Having a star as the first symbol in a comment causes an error
+
 ## To Do
 - [x] Basic Arithmetic symbols
   - [ ] Order of operations
@@ -27,9 +30,9 @@ Toybox: Little Quilt for GLSL
   - [ ] Roald Dahl
   - [ ] Mandelbrot set ?
 - [ ] Function support
-  - Allow references to other toybox files to be used as a sort of `val` toy.
+  - [ ] Allow references to other toybox files to be used as a sort of `val` toy. ?
 - [x] Comment support
 - [ ] Some way to communicate parameter names
   - Potentially in AST print-out?
-- [-] External textures
+- [x] External textures
 - [ ] Some way to record or screenshot the page in browser ?

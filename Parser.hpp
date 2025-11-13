@@ -15,7 +15,7 @@ class Parser {
     int lineCount = 1;
 
   public:
-    std::string TexturePath = "./cherub.jpg";
+    std::string TexturePath = "./checker-map.png";
     Parser()
         : filename("undefined") {
     }
@@ -29,32 +29,32 @@ class Parser {
     }
 
     void Parse(std::string str) {
-        // Lexer lex;
-        // std::string temp = str;
-        // int tempLinecount = 0;
-        // Token next = lex.GetNext(temp, tempLinecount);
-        // if (next.type != IDENTIFIER) {
-        //     SyntaxError("Expected identifier to start program. Found: " + next.ToString() + " instead.");
-        //     return;
-        // }
+        Lexer lex;
+        std::string temp = str;
+        int tempLinecount = 0;
 
-        // // check if statement is an assignment
-        // if (lex.PeekNext(temp).type == EQUALS) {
-        //     Token identifier = lex.GetNext(str, lineCount); // start reading for real. We know this is an identifier
-        //     lex.GetNext(str, lineCount);                    // We know this will be an EQUALS. Throw it away
+        Token next = lex.GetNext(temp, tempLinecount);
+        // check for equals
+        // check for identifier
+        if (next.type == IDENTIFIER) {
+            // At this point we could either already be in the expression or in an assignment
+            if (lex.PeekNext(temp).type == EQUALS) {            // We now know we are in an assignment
+                Token identifier = lex.GetNext(str, lineCount); // start reading for real. We know this is an identifier
+                lex.GetNext(str, lineCount);                    // We know this will be an EQUALS. Throw it away
 
-        //     // We have at least one assignment.
-        //     if (lex.PeekNext(str).type == FILEPATH) { // We have a texture assignment
-        //         // #TODO add support for arbitrary names for files
-        //         if (identifier.value == "texture") {
-        //             TexturePath = lex.GetNext(str, lineCount).value;
-        //         }
-        //     } else {
-        //         SyntaxError("Attempted to assign something other than a filepath (" + lex.PeekNext(str).ToString() + ") to a variable. No support yet.");
-        //     }
-        //     // #TODO put logic here for reading functions or variables
-        //     // #TODO check for program deliminator to allow for multiple assignments
-        // }
+                // We have at least one assignment.
+                if (lex.PeekNext(str).type == FILEPATH) { // We have a texture assignment
+                    // #TODO add support for arbitrary names for files
+                    if (identifier.value == "texture") {
+                        TexturePath = lex.GetNext(str, lineCount).value;
+                    }
+                } else {
+                    SyntaxError("Attempted to assign something other than a filepath (" + lex.PeekNext(str).ToString() + ") to a variable. No support yet.");
+                }
+                // #TODO put logic here for reading functions or variables
+                // #TODO check for program deliminator to allow for multiple assignments
+            } // else: fall back to ParseStatement
+        }
 
         // start parsing statement
         ParseStatement(str, &document);
