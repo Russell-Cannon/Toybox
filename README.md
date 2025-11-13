@@ -8,9 +8,6 @@ Toybox: Little Quilt for GLSL
 4. Enter `first.tb`
 5. out.html will have been created. Open it in a browser.
 
-## Bugs
-Having a star as the first symbol in a comment causes an error
-
 ## To Do
 - [x] Basic Arithmetic symbols
   - [ ] Order of operations

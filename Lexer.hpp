@@ -9,7 +9,7 @@
 // All tokens with their names and respective patterns
 const TokenType
     IDENTIFIER{"Identifier", std::regex("^[a-z]+", std::regex::icase)},
-    FILEPATH{"File Path", std::regex("^(\\.\\.?\\/)+[a-z ._-]*\\.[a-z]+", std::regex::icase)},
+    FILEPATH{"File Path", std::regex("^(\\.\\.?\\/)+[a-z ._-]*\\.[a-z0-9]+", std::regex::icase)},
     OPEN_PARENTHESIS{"Open Parenthesis", std::regex("^\\(")},
     CLOSE_PARENTHESIS{"Close Parenthesis", std::regex("^\\)")},
     COMMA{"Comma", std::regex("^,")},
@@ -18,7 +18,7 @@ const TokenType
     EQUALS{"Equals Sign", std::regex("^=")},
     AXIS{"Axis", std::regex("^\\.[xyzwrgbastpquv]", std::regex::icase)},
     EOI{"END OF INPUT", std::regex("\\b\\B")},
-    LINE_COMMENT{"Line comment", std::regex("^\\/\\/.*\\n")},
+    LINE_COMMENT{"Line comment", std::regex("^\\/\\/.*(\\n|$)")},
     MULTI_LINE_COMMENT{"Multi or inline comment", std::regex("^\\/\\*(.|\\n)*\\*\\/")},
     ERROR{"UNKNOWN SYMBOL", std::regex("\\b\\B")};
 
@@ -50,13 +50,18 @@ class Lexer {
         if (str.length() == 0)
             return {EOI, "Empty String"};
 
-        if (std::regex_search(str, match, MULTI_LINE_COMMENT.pattern)) {
-            str = str.substr(match[0].length());
-            return GetNext(str, _lineCount);
-        }
         if (std::regex_search(str, match, LINE_COMMENT.pattern)) {
             str = str.substr(match[0].length());
-            return GetNext(str, _lineCount);
+            _lineCount++;
+            return GetNext(str, _lineCount); // skip to next token
+        }
+        if (std::regex_search(str, match, MULTI_LINE_COMMENT.pattern)) {
+            for (char c : match[0].str())
+                if (c == '\n')
+                    _lineCount++;
+
+            str = str.substr(match[0].length());
+            return GetNext(str, _lineCount); // skip to next token
         }
 
         DEBUG("Current string: ", str);

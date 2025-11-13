@@ -82,7 +82,7 @@ class Parser {
 
         Token next = lex.GetNext(str, lineCount);
         if (next.type != CLOSE_PARENTHESIS)
-            return SyntaxError("Expected closing parenthesis in " + typedToy->Name() + " operation. Found " + next.type.name + " instead.");
+            return SyntaxError("Expected closing parenthesis in " + typedToy->Name() + " operation. Found " + next.ToString() + " instead.");
         toy->AddChild(typedToy);
         return true;
     }
@@ -230,7 +230,7 @@ class Parser {
         } else if (next.type == EOI) {
             return false;
         }
-        return SyntaxError("Unexpected symbol: " + next.type.name);
+        return SyntaxError("Unexpected symbol: " + next.ToString());
     }
 
     bool ParseStatement(std::string& str, Toy* toy) {
