@@ -10,11 +10,13 @@
 // All tokens with their names and respective patterns
 const TokenType
     IDENTIFIER{"Identifier", std::regex("^[a-z]+", std::regex::icase)},
+    FILEPATH{"File Path", std::regex("^\\.\\.?\\/.*\\/", std::regex::icase)},
     OPEN_PARENTHESIS{"Open Parenthesis", std::regex("^\\(")},
     CLOSE_PARENTHESIS{"Close Parenthesis", std::regex("^\\)")},
     COMMA{"Comma", std::regex("^,")},
     NUMBER{"Number", std::regex("(^-?[0-9]*\\.[0-9]+[fd]?|^-?[0-9]+[fd]?)", std::regex::icase)},
     OPERATOR{"Mathematical Operator", std::regex("^[+-/*]")},
+    EQUALS{"Equals Sign", std::regex("^=")},
     AXIS{"Axis", std::regex("^\\.[xyzwrgbastpquv]", std::regex::icase)},
     EOI{"END OF INPUT", std::regex("\\b\\B")},
     LINE_COMMENT{"Line comment", std::regex("^\\/\\/.*\\n")},
@@ -24,11 +26,13 @@ const TokenType
 // List of tokens which are checked against
 const TokenType TokenTypes[] = {
     IDENTIFIER,
+    FILEPATH,
     OPEN_PARENTHESIS,
     CLOSE_PARENTHESIS,
     COMMA,
     NUMBER,
     OPERATOR,
+    EQUALS,
     AXIS};
 
 class Lexer {

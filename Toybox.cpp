@@ -37,11 +37,10 @@ int main(int argc, char* argv[]) {
                 command += c;
             } while (c != '$');
 
-            std::cout << command << '\n';
             if (command == "output$") {
                 fout << parser.GenerateGLSL();
             } else if (command == "texture$") {
-                fout << "./cherub.jpg";
+                fout << parser.TexturePath;
             }
 
             scaffold.get(c); // get next character after closing $

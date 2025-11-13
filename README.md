@@ -15,8 +15,6 @@ Toybox: Little Quilt for GLSL
 - [x] Vector math
 - [x] Distance fields
 - [x] Map of AST
-- [ ] Combine html input files
-- [ ] Change textures in script
 - [ ] Useful built-in functions
   - [ ] Sobel filter
   - [ ] Gaussian blur ?
@@ -31,5 +29,7 @@ Toybox: Little Quilt for GLSL
 - [ ] Function support
   - Allow references to other toybox files to be used as a sort of `val` toy.
 - [x] Comment support
-- [ ] External textures
+- [ ] Some way to communicate parameter names
+  - Potentially in AST print-out?
+- [-] External textures
 - [ ] Some way to record or screenshot the page in browser ?

@@ -15,6 +15,7 @@ class Parser {
     int lineCount = 1;
 
   public:
+    std::string TexturePath = "./cherub.jpg";
     Parser()
         : filename("undefined") {
     }
@@ -28,7 +29,35 @@ class Parser {
     }
 
     void Parse(std::string str) {
-        Parse(str, &document);
+        // Lexer lex;
+        // std::string temp = str;
+        // int tempLinecount = 0;
+        // Token next = lex.GetNext(temp, tempLinecount);
+        // if (next.type != IDENTIFIER) {
+        //     SyntaxError("Expected identifier to start program. Found: " + next.ToString() + " instead.");
+        //     return;
+        // }
+
+        // // check if statement is an assignment
+        // if (lex.PeekNext(temp).type == EQUALS) {
+        //     Token identifier = lex.GetNext(str, lineCount); // start reading for real. We know this is an identifier
+        //     lex.GetNext(str, lineCount);                    // We know this will be an EQUALS. Throw it away
+
+        //     // We have at least one assignment.
+        //     if (lex.PeekNext(str).type == FILEPATH) { // We have a texture assignment
+        //         // #TODO add support for arbitrary names for files
+        //         if (identifier.value == "texture") {
+        //             TexturePath = lex.GetNext(str, lineCount).value;
+        //         }
+        //     } else {
+        //         SyntaxError("Attempted to assign something other than a filepath (" + lex.PeekNext(str).ToString() + ") to a variable. No support yet.");
+        //     }
+        //     // #TODO put logic here for reading functions or variables
+        //     // #TODO check for program deliminator to allow for multiple assignments
+        // }
+
+        // start parsing statement
+        ParseStatement(str, &document);
     }
 
     std::string GenerateGLSL() {
@@ -42,7 +71,7 @@ class Parser {
         if (lex.GetNext(str, lineCount).type != OPEN_PARENTHESIS)
             return SyntaxError("Expected opening parenthesis in " + typedToy->Name() + " operation");
         for (int i = 0; i < arguments; i++) {
-            if (!Parse(str, typedToy))
+            if (!ParseStatement(str, typedToy))
                 return SyntaxError("Expected argument #" + std::to_string(i + 1) + " in " + typedToy->Name() + " operation");
             if (i < arguments - 1) { // not the last arguments
                 TokenType next = lex.GetNext(str, lineCount).type;
@@ -76,12 +105,12 @@ class Parser {
         if (lex.GetNext(str, lineCount).type != OPEN_PARENTHESIS)
             return SyntaxError("Expected opening parenthesis in " + typedToy->Name() + " operation");
         // at least one argument is required
-        if (!Parse(str, typedToy))
+        if (!ParseStatement(str, typedToy))
             return SyntaxError("Expected argument in " + typedToy->Name() + " operation");
 
         while (lex.PeekNext(str).type == COMMA) {
             lex.GetNext(str, lineCount); // consume comma
-            if (!Parse(str, typedToy))
+            if (!ParseStatement(str, typedToy))
                 return SyntaxError("Expected argument after comma in " + typedToy->Name() + " operation");
         }
         if (lex.GetNext(str, lineCount).type != CLOSE_PARENTHESIS)
@@ -193,7 +222,7 @@ class Parser {
             // In the case of ()
             if (lex.PeekNext(str).type == CLOSE_PARENTHESIS)
                 return false;
-            if (!Parse(str, toy))
+            if (!ParseStatement(str, toy))
                 return false;
             if (lex.GetNext(str, lineCount).type != CLOSE_PARENTHESIS)
                 return SyntaxError("Expected closing parenthesis after empty opening parenthesis");
@@ -204,7 +233,7 @@ class Parser {
         return SyntaxError("Unexpected symbol: " + next.type.name);
     }
 
-    bool Parse(std::string& str, Toy* toy) {
+    bool ParseStatement(std::string& str, Toy* toy) {
         Lexer lex;
         Toy* temp = new Toy();
         if (!ParseToy(str, temp))
@@ -246,7 +275,7 @@ class Parser {
             returnToy = new Divide();
 
         Toy* second = new Toy();
-        if (!Parse(str, second))
+        if (!ParseStatement(str, second))
             return SyntaxError("No operand to the right of " + op);
 
         returnToy->AddChild(first->children[0]);
