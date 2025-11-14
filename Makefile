@@ -1,11 +1,11 @@
-Toybox:	Toybox.o	Toy.o	Types.h	Lexer.h	Parser.h
-	g++ -g -o Toybox Toybox.cpp Toy.o
+Toybox:	Toybox.o	Toy.o	Parser.o Types.h	Lexer.h	
+	g++ -g -o Toybox Toybox.cpp Toy.o Parser.o
 
 # Toybox.o:	Toybox.cpp	Parser.h
 # 	g++ -g -c Toybox.cpp
 
-# Parser.o:	Parser.cpp	Parser.h	Lexer.h	Toy.h	Types.h
-# 	g++ -g -c Parser.cpp
+Parser.o:	Parser.h	Parser.cpp	Lexer.h	Toy.h	Types.h
+	g++ -g -c Parser.cpp
 
 # Lexer.o:	Lexer.h
 # 	g++ -g -c Lexer.cpp
