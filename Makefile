@@ -1,4 +1,4 @@
-Toybox:	Toybox.o	Toy.o	Parser.o	Lexer.o	Types.h	
+Toybox.exe:	Toybox.o	Toy.o	Parser.o	Lexer.o	Types.h	
 	g++ -g -o Toybox Toybox.cpp Toy.o Parser.o Lexer.o 
 
 
