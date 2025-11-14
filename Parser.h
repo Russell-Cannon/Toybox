@@ -1,11 +1,9 @@
 #pragma once
 
-#include "Lexer.hpp"
-#include "Toy.hpp"
-#include "Types.hpp"
+#include "Lexer.h"
+#include "Toy.h"
+#include "Types.h"
 #include <cstdlib>
-#include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <string>
 
@@ -214,7 +212,7 @@ class Parser {
         } else if (next.type == NUMBER) {
             float number = std::atof(next.value.c_str());
             LitNumber* litNum = new LitNumber();
-            (*litNum).Value = number;
+            litNum->SetNumber(number);
             toy->AddChild(litNum);
             return litNum;
         }
@@ -249,14 +247,14 @@ class Parser {
                 returnToy = new Y();
             else if (axis[1] == 'z' || axis[1] == 'b')
                 returnToy = new Z();
-            returnToy->AddChild(temp->children[0]);
+            returnToy->AddChild(temp->GetChild(0));
             toy->AddChild(returnToy);
             return true;
         } else if (lex.PeekNext(str).type == OPERATOR) {
             return ParseMathematicalOperator(str, toy, temp);
         }
 
-        toy->AddChild(temp->children[0]);
+        toy->AddChild(temp->GetChild(0));
         return true;
     }
 
@@ -278,8 +276,8 @@ class Parser {
         if (!ParseStatement(str, second))
             return SyntaxError("No operand to the right of " + op);
 
-        returnToy->AddChild(first->children[0]);
-        returnToy->AddChild(second->children[0]);
+        returnToy->AddChild(first->GetChild(0));
+        returnToy->AddChild(second->GetChild(0));
         toy->AddChild(returnToy);
 
         return true;
@@ -287,8 +285,8 @@ class Parser {
 
     void PrintAST() {
         std::cout << document.Name() << std::endl;
-        if (!document.children.empty())
-            PrintToy(document.children[0]);
+        if (!document.Empty())
+            PrintToy(document.GetChild(0));
     }
 
     void PrintToy(Toy* toy, bool last = true, std::string pre = "") {
@@ -310,8 +308,8 @@ class Parser {
 
         std::cout << DASH << toy->Name() << std::endl;
 
-        for (int i = 0; i < toy->children.size(); i++) {
-            PrintToy(toy->children[i], i == toy->children.size() - 1, pre + ' ' + BAR);
+        for (int i = 0; i < toy->NumChildren(); i++) {
+            PrintToy(toy->GetChild(i), i == toy->NumChildren() - 1, pre + ' ' + BAR);
         }
     }
 };
