@@ -8,9 +8,13 @@ Parser::Parser(std::string _filename)
     : filename(_filename) {
 }
 
-bool Parser::SyntaxError(std::string message) {
+bool Parser::syntaxError(std::string message) {
     std::cerr << filename << ':' << lineCount << " : " << message << '\n';
     return false;
+}
+
+std::string Parser::GetTextureFilePath() const {
+    return TexturePath;
 }
 
 void Parser::Parse(std::string str) {
@@ -34,7 +38,7 @@ void Parser::Parse(std::string str) {
                     TexturePath = lex.GetNext(str, lineCount).value;
                 }
             } else {
-                SyntaxError("Attempted to assign something other than a filepath (" + lex.PeekNext(str).ToString() + ") to a variable. No support yet.");
+                syntaxError("Attempted to assign something other than a filepath (" + lex.PeekNext(str).ToString() + ") to a variable. No support yet.");
             }
             // #TODO put logic here for reading functions or variables
             // #TODO check for program deliminator to allow for multiple assignments
@@ -42,7 +46,7 @@ void Parser::Parse(std::string str) {
     }
 
     // start parsing statement
-    ParseStatement(str, &document);
+    parseStatement(str, &document);
 }
 
 std::string Parser::GenerateGLSL() {
@@ -50,61 +54,61 @@ std::string Parser::GenerateGLSL() {
 }
 
 template <typename ToyType>
-bool Parser::ParseNAryOperation(std::string& str, Toy* toy, int arguments) {
+bool Parser::parseNAryOperation(std::string& str, Toy* toy, int arguments) {
     Lexer lex;
     Toy* typedToy = new ToyType();
     if (lex.GetNext(str, lineCount).type != OPEN_PARENTHESIS)
-        return SyntaxError("Expected opening parenthesis in " + typedToy->Name() + " operation");
+        return syntaxError("Expected opening parenthesis in " + typedToy->Name() + " operation");
     for (int i = 0; i < arguments; i++) {
-        if (!ParseStatement(str, typedToy))
-            return SyntaxError("Expected argument #" + std::to_string(i + 1) + " in " + typedToy->Name() + " operation");
+        if (!parseStatement(str, typedToy))
+            return syntaxError("Expected argument #" + std::to_string(i + 1) + " in " + typedToy->Name() + " operation");
         if (i < arguments - 1) { // not the last arguments
             TokenType next = lex.GetNext(str, lineCount).type;
             if (next != COMMA)
-                return SyntaxError("Expected comma after argument #" + std::to_string(i + 1) + " in " + typedToy->Name() + " operation. Received: " + next.name + " instead.");
+                return syntaxError("Expected comma after argument #" + std::to_string(i + 1) + " in " + typedToy->Name() + " operation. Received: " + next.name + " instead.");
         }
     }
 
     Token next = lex.GetNext(str, lineCount);
     if (next.type != CLOSE_PARENTHESIS)
-        return SyntaxError("Expected closing parenthesis in " + typedToy->Name() + " operation. Found " + next.ToString() + " instead.");
+        return syntaxError("Expected closing parenthesis in " + typedToy->Name() + " operation. Found " + next.ToString() + " instead.");
     toy->AddChild(typedToy);
     return true;
 }
 template <typename ToyType>
-bool Parser::ParseUnaryOperation(std::string& str, Toy* toy) {
-    return ParseNAryOperation<ToyType>(str, toy, 1);
+bool Parser::parseUnaryOperation(std::string& str, Toy* toy) {
+    return parseNAryOperation<ToyType>(str, toy, 1);
 }
 template <typename ToyType>
-bool Parser::ParseBinaryOperation(std::string& str, Toy* toy) {
-    return ParseNAryOperation<ToyType>(str, toy, 2);
+bool Parser::parseBinaryOperation(std::string& str, Toy* toy) {
+    return parseNAryOperation<ToyType>(str, toy, 2);
 }
 template <typename ToyType>
-bool Parser::ParseTrinaryOperation(std::string& str, Toy* toy) {
-    return ParseNAryOperation<ToyType>(str, toy, 3);
+bool Parser::parseTrinaryOperation(std::string& str, Toy* toy) {
+    return parseNAryOperation<ToyType>(str, toy, 3);
 }
 template <typename ToyType>
-bool Parser::ParseExpandingSizeOperation(std::string& str, Toy* toy) {
+bool Parser::parseExpandingSizeOperation(std::string& str, Toy* toy) {
     Lexer lex;
     Toy* typedToy = new ToyType();
     if (lex.GetNext(str, lineCount).type != OPEN_PARENTHESIS)
-        return SyntaxError("Expected opening parenthesis in " + typedToy->Name() + " operation");
+        return syntaxError("Expected opening parenthesis in " + typedToy->Name() + " operation");
     // at least one argument is required
-    if (!ParseStatement(str, typedToy))
-        return SyntaxError("Expected argument in " + typedToy->Name() + " operation");
+    if (!parseStatement(str, typedToy))
+        return syntaxError("Expected argument in " + typedToy->Name() + " operation");
 
     while (lex.PeekNext(str).type == COMMA) {
         lex.GetNext(str, lineCount); // consume comma
-        if (!ParseStatement(str, typedToy))
-            return SyntaxError("Expected argument after comma in " + typedToy->Name() + " operation");
+        if (!parseStatement(str, typedToy))
+            return syntaxError("Expected argument after comma in " + typedToy->Name() + " operation");
     }
     if (lex.GetNext(str, lineCount).type != CLOSE_PARENTHESIS)
-        return SyntaxError("Expected closing parenthesis in " + typedToy->Name() + " operation");
+        return syntaxError("Expected closing parenthesis in " + typedToy->Name() + " operation");
     toy->AddChild(typedToy);
     return true;
 }
 
-bool Parser::ParseToy(std::string& str, Toy* toy) {
+bool Parser::parseToy(std::string& str, Toy* toy) {
     Lexer lex;
     Token next = lex.GetNext(str, lineCount);
     if (next.type == IDENTIFIER) {
@@ -115,87 +119,87 @@ bool Parser::ParseToy(std::string& str, Toy* toy) {
             toy->AddChild(new LitTime());
             return true;
         } else if (next.value == "frac" || next.value == "fract" || next.value == "fraction" || next.value == "remainder") {
-            return ParseUnaryOperation<Fract>(str, toy);
+            return parseUnaryOperation<Fract>(str, toy);
         } else if (next.value == "saw" || next.value == "sawtooth" || next.value == "mirror") {
-            return ParseUnaryOperation<SawTooth>(str, toy);
+            return parseUnaryOperation<SawTooth>(str, toy);
         } else if (next.value == "sin") {
-            return ParseUnaryOperation<Sin>(str, toy);
+            return parseUnaryOperation<Sin>(str, toy);
         } else if (next.value == "cos") {
-            return ParseUnaryOperation<Cos>(str, toy);
+            return parseUnaryOperation<Cos>(str, toy);
         } else if (next.value == "tan") {
-            return ParseUnaryOperation<Tan>(str, toy);
+            return parseUnaryOperation<Tan>(str, toy);
         } else if (next.value == "normalize" || next.value == "normalized" || next.value == "normal") {
-            return ParseUnaryOperation<Normalize>(str, toy);
+            return parseUnaryOperation<Normalize>(str, toy);
         } else if (next.value == "length" || next.value == "magnitude" || next.value == "len") {
-            return ParseUnaryOperation<Length>(str, toy);
+            return parseUnaryOperation<Length>(str, toy);
         } else if (next.value == "text" || next.value == "texture") {
-            return ParseUnaryOperation<Texture>(str, toy);
+            return parseUnaryOperation<Texture>(str, toy);
         } else if (next.value == "ceil" || next.value == "ceiling") {
-            return ParseUnaryOperation<Ceiling>(str, toy);
+            return parseUnaryOperation<Ceiling>(str, toy);
         } else if (next.value == "floor") {
-            return ParseUnaryOperation<Floor>(str, toy);
+            return parseUnaryOperation<Floor>(str, toy);
         } else if (next.value == "round") {
-            return ParseUnaryOperation<Round>(str, toy);
+            return parseUnaryOperation<Round>(str, toy);
         } else if (next.value == "neg" || next.value == "negate") {
-            return ParseUnaryOperation<Negate>(str, toy);
+            return parseUnaryOperation<Negate>(str, toy);
         } else if (next.value == "abs" || next.value == "absolute") {
-            return ParseUnaryOperation<Absolute>(str, toy);
+            return parseUnaryOperation<Absolute>(str, toy);
         } else if (next.value == "x") {
-            return ParseUnaryOperation<X>(str, toy);
+            return parseUnaryOperation<X>(str, toy);
         } else if (next.value == "y") {
-            return ParseUnaryOperation<Y>(str, toy);
+            return parseUnaryOperation<Y>(str, toy);
         } else if (next.value == "z") {
-            return ParseUnaryOperation<Z>(str, toy);
+            return parseUnaryOperation<Z>(str, toy);
         } else if (next.value == "screen") {
-            return ParseUnaryOperation<Screen>(str, toy);
+            return parseUnaryOperation<Screen>(str, toy);
         } else if (next.value == "random" || next.value == "rand") {
-            return ParseUnaryOperation<Random>(str, toy);
+            return parseUnaryOperation<Random>(str, toy);
         } else if (next.value == "noise") {
-            return ParseUnaryOperation<Noise>(str, toy);
+            return parseUnaryOperation<Noise>(str, toy);
         }
 
         else if (next.value == "mul" || next.value == "mult" || next.value == "multiply") {
-            return ParseBinaryOperation<Multiply>(str, toy);
+            return parseBinaryOperation<Multiply>(str, toy);
         } else if (next.value == "div" || next.value == "divide") {
-            return ParseBinaryOperation<Divide>(str, toy);
+            return parseBinaryOperation<Divide>(str, toy);
         } else if (next.value == "add") {
-            return ParseBinaryOperation<Add>(str, toy);
+            return parseBinaryOperation<Add>(str, toy);
         } else if (next.value == "sub" || next.value == "subtract") {
-            return ParseBinaryOperation<Subtract>(str, toy);
+            return parseBinaryOperation<Subtract>(str, toy);
         } else if (next.value == "mod" || next.value == "modulus" || next.value == "modulo") {
-            return ParseBinaryOperation<Modulus>(str, toy);
+            return parseBinaryOperation<Modulus>(str, toy);
         } else if (next.value == "step" || next.value == "if") {
-            return ParseBinaryOperation<Step>(str, toy);
+            return parseBinaryOperation<Step>(str, toy);
         } else if (next.value == "polygon" || next.value == "poly") {
-            return ParseBinaryOperation<NGon>(str, toy);
+            return parseBinaryOperation<NGon>(str, toy);
         } else if (next.value == "dot") {
-            return ParseBinaryOperation<Dot>(str, toy);
+            return parseBinaryOperation<Dot>(str, toy);
         } else if (next.value == "cross") {
-            return ParseBinaryOperation<Cross>(str, toy);
+            return parseBinaryOperation<Cross>(str, toy);
         } else if (next.value == "distance" || next.value == "dist") {
-            return ParseBinaryOperation<Distance>(str, toy);
+            return parseBinaryOperation<Distance>(str, toy);
         } else if (next.value == "direction" || next.value == "dir") {
-            return ParseBinaryOperation<Direction>(str, toy);
+            return parseBinaryOperation<Direction>(str, toy);
         } else if (next.value == "circle") {
-            return ParseBinaryOperation<Circle>(str, toy);
+            return parseBinaryOperation<Circle>(str, toy);
         }
 
         else if (next.value == "com" || next.value == "comb" || next.value == "combine") {
-            return ParseTrinaryOperation<Combine>(str, toy);
+            return parseTrinaryOperation<Combine>(str, toy);
         } else if (next.value == "clamp") {
-            return ParseTrinaryOperation<Clamp>(str, toy);
+            return parseTrinaryOperation<Clamp>(str, toy);
         } else if (next.value == "mix" || next.value == "lerp") {
-            return ParseTrinaryOperation<Mix>(str, toy);
+            return parseTrinaryOperation<Mix>(str, toy);
         } else if (next.value == "smoothstep") {
-            return ParseTrinaryOperation<SmoothStep>(str, toy);
+            return parseTrinaryOperation<SmoothStep>(str, toy);
         } else if (next.value == "line") {
-            return ParseTrinaryOperation<Line>(str, toy);
+            return parseTrinaryOperation<Line>(str, toy);
         } else if (next.value == "linesegment" || next.value == "segment") {
-            return ParseTrinaryOperation<LineSegment>(str, toy);
+            return parseTrinaryOperation<LineSegment>(str, toy);
         } else if (next.value == "avg" || next.value == "average") {
-            return ParseExpandingSizeOperation<Average>(str, toy);
+            return parseExpandingSizeOperation<Average>(str, toy);
         } else
-            return SyntaxError("Unknown identifier: " + next.value);
+            return syntaxError("Unknown identifier: " + next.value);
     } else if (next.type == NUMBER) {
         float number = std::atof(next.value.c_str());
         LitNumber* litNum = new LitNumber();
@@ -207,21 +211,21 @@ bool Parser::ParseToy(std::string& str, Toy* toy) {
         // In the case of ()
         if (lex.PeekNext(str).type == CLOSE_PARENTHESIS)
             return false;
-        if (!ParseStatement(str, toy))
+        if (!parseStatement(str, toy))
             return false;
         if (lex.GetNext(str, lineCount).type != CLOSE_PARENTHESIS)
-            return SyntaxError("Expected closing parenthesis after empty opening parenthesis");
+            return syntaxError("Expected closing parenthesis after empty opening parenthesis");
         return true;
     } else if (next.type == EOI) {
         return false;
     }
-    return SyntaxError("Unexpected symbol: " + next.ToString());
+    return syntaxError("Unexpected symbol: " + next.ToString());
 }
 
-bool Parser::ParseStatement(std::string& str, Toy* toy) {
+bool Parser::parseStatement(std::string& str, Toy* toy) {
     Lexer lex;
     Toy* temp = new Toy();
-    if (!ParseToy(str, temp))
+    if (!parseToy(str, temp))
         return false;
 
     // Only peek: we don't always expect a .? but we want one.
@@ -238,14 +242,14 @@ bool Parser::ParseStatement(std::string& str, Toy* toy) {
         toy->AddChild(returnToy);
         return true;
     } else if (lex.PeekNext(str).type == OPERATOR) {
-        return ParseMathematicalOperator(str, toy, temp);
+        return parseMathematicalOperator(str, toy, temp);
     }
 
     toy->AddChild(temp->GetChild(0));
     return true;
 }
 
-bool Parser::ParseMathematicalOperator(std::string& str, Toy* toy, Toy* first) {
+bool Parser::parseMathematicalOperator(std::string& str, Toy* toy, Toy* first) {
     Lexer lex;
 
     std::string op = lex.GetNext(str, lineCount).value;
@@ -260,8 +264,8 @@ bool Parser::ParseMathematicalOperator(std::string& str, Toy* toy, Toy* first) {
         returnToy = new Divide();
 
     Toy* second = new Toy();
-    if (!ParseStatement(str, second))
-        return SyntaxError("No operand to the right of " + op);
+    if (!parseStatement(str, second))
+        return syntaxError("No operand to the right of " + op);
 
     returnToy->AddChild(first->GetChild(0));
     returnToy->AddChild(second->GetChild(0));
@@ -273,10 +277,10 @@ bool Parser::ParseMathematicalOperator(std::string& str, Toy* toy, Toy* first) {
 void Parser::PrintAST() {
     std::cout << document.Name() << std::endl;
     if (!document.Empty())
-        PrintToy(document.GetChild(0), true, "");
+        printToy(document.GetChild(0), true, "");
 }
 
-void Parser::PrintToy(Toy* toy, bool last, std::string pre) {
+void Parser::printToy(Toy* toy, bool last, std::string pre) {
     const char BAR = char(179) /*│*/, MIDDLE = char(195) /*├*/, LAST = char(192) /*└*/, DASH = char(196) /*─*/;
     if (pre.empty())
         pre += BAR;
@@ -296,6 +300,6 @@ void Parser::PrintToy(Toy* toy, bool last, std::string pre) {
     std::cout << DASH << toy->Name() << std::endl;
 
     for (int i = 0; i < toy->NumChildren(); i++) {
-        PrintToy(toy->GetChild(i), i == toy->NumChildren() - 1, pre + ' ' + BAR);
+        printToy(toy->GetChild(i), i == toy->NumChildren() - 1, pre + ' ' + BAR);
     }
 }
