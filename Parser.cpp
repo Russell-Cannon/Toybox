@@ -281,7 +281,11 @@ void Parser::PrintAST() {
 }
 
 void Parser::printToy(Toy* toy, bool last, std::string pre) {
+#ifdef _WIN32
     const char BAR = char(179) /*│*/, MIDDLE = char(195) /*├*/, LAST = char(192) /*└*/, DASH = char(196) /*─*/;
+#elif __linux__ // WSL wouldn't print Extended ASCII characters right. They might work on an actual Linux operating system, I'm not sure.
+    const char BAR = '|' /*│*/, MIDDLE = '>' /*├*/, LAST = 'L' /*└*/, DASH = '-' /*─*/;
+#endif
     if (pre.empty())
         pre += BAR;
 
