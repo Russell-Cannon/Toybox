@@ -1,19 +1,20 @@
 #pragma once
+#include <memory>
 #include <string>
 #include <vector>
 
 class Toy {
   public:
-    Toy() {}
+    Toy();
     virtual std::string Name();
     virtual std::string GenerateGLSL();
-    void AddChild(Toy* toy);
-    Toy* GetChild(int n) const;
+    void AddChild(std::shared_ptr<Toy> toy);
+    std::shared_ptr<Toy> GetChild(int n) const;
     int NumChildren() const;
     bool Empty() const;
 
   protected:
-    std::vector<Toy*> children;
+    std::vector<std::shared_ptr<Toy>> children;
 };
 
 // Literal Toys

@@ -1,12 +1,14 @@
 #include "Toy.h"
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 
+Toy::Toy() {}
 std::string Toy::Name() { return "Abstract Toy"; }
 std::string Toy::GenerateGLSL() { return ""; }
-void Toy::AddChild(Toy* toy) { children.push_back(toy); }
-Toy* Toy::GetChild(int n) const { return children[n]; }
+void Toy::AddChild(std::shared_ptr<Toy> toy) { children.push_back(toy); }
+std::shared_ptr<Toy> Toy::GetChild(int n) const { return children[n]; }
 int Toy::NumChildren() const { return children.size(); }
 bool Toy::Empty() const { return children.empty(); };
 
@@ -31,7 +33,7 @@ std::string Document::Name() { return "Document"; }
 std::string Document::GenerateGLSL() {
     if (children.empty()) {
         std::cerr << Name() << " generated with no children\n";
-        AddChild(new LitError());
+        AddChild(std::shared_ptr<Toy>(new LitError()));
     }
     return "outColor = vec4(" + children[0]->GenerateGLSL() + ", 1.0);\n";
 }
@@ -41,7 +43,7 @@ std::string Unary::Name() { return "Abstract Unary Operation"; }
 std::string Unary::GenerateGLSL() {
     if (children.empty()) {
         std::cerr << Name() << " generated with no children\n";
-        AddChild(new LitError());
+        AddChild(std::shared_ptr<Toy>(new LitError()));
     }
     return "";
 }
@@ -169,11 +171,11 @@ std::string Binary::Name() { return "Abstract Binary Operation"; }
 std::string Binary::GenerateGLSL() {
     if (children.empty()) {
         std::cerr << Name() << " generated with no children\n";
-        AddChild(new LitError());
-        AddChild(new LitError());
+        AddChild(std::shared_ptr<Toy>(new LitError()));
+        AddChild(std::shared_ptr<Toy>(new LitError()));
     } else if (children.size() == 1) {
         std::cerr << Name() << "generated with only one child\n";
-        AddChild(new LitError());
+        AddChild(std::shared_ptr<Toy>(new LitError()));
     }
     return "";
 }
@@ -261,16 +263,16 @@ std::string Trinary::Name() { return "Abstract Trinary Operation"; }
 std::string Trinary::GenerateGLSL() {
     if (children.empty()) {
         std::cerr << Name() << " generated with no children\n";
-        AddChild(new LitError());
-        AddChild(new LitError());
-        AddChild(new LitError());
+        AddChild(std::shared_ptr<Toy>(new LitError()));
+        AddChild(std::shared_ptr<Toy>(new LitError()));
+        AddChild(std::shared_ptr<Toy>(new LitError()));
     } else if (children.size() == 2) {
         std::cerr << Name() << " generated only two children\n";
-        AddChild(new LitError());
+        AddChild(std::shared_ptr<Toy>(new LitError()));
     } else if (children.size() == 1) {
         std::cerr << Name() << "generated with only one child\n";
-        AddChild(new LitError());
-        AddChild(new LitError());
+        AddChild(std::shared_ptr<Toy>(new LitError()));
+        AddChild(std::shared_ptr<Toy>(new LitError()));
     }
     return "";
 }
@@ -352,7 +354,7 @@ std::string Average::Name() { return "Average"; }
 std::string Average::GenerateGLSL() {
     if (children.empty()) {
         std::cerr << Name() << " generated with no children\n";
-        AddChild(new LitError());
+        AddChild(std::shared_ptr<Toy>(new LitError()));
     }
     std::string output = "((";
     for (int i = 0; i < children.size(); i++) {

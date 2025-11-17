@@ -1,11 +1,15 @@
 #include "Parser.h"
+#include "Toy.h"
 #include <iostream>
+#include <memory>
 
 Parser::Parser()
     : filename("undefined") {
+    document = std::shared_ptr<Toy>(new Document());
 }
 Parser::Parser(std::string _filename)
     : filename(_filename) {
+    document = std::shared_ptr<Toy>(new Document());
 }
 
 bool Parser::syntaxError(std::string message) {
@@ -46,17 +50,17 @@ void Parser::Parse(std::string str) {
     }
 
     // start parsing statement
-    parseStatement(str, &document);
+    parseStatement(str, document);
 }
 
 std::string Parser::GenerateGLSL() {
-    return document.GenerateGLSL();
+    return document->GenerateGLSL();
 }
 
 template <typename ToyType>
-bool Parser::parseNAryOperation(std::string& str, Toy* toy, int arguments) {
+bool Parser::parseNAryOperation(std::string& str, std::shared_ptr<Toy> toy, int arguments) {
     Lexer lex;
-    Toy* typedToy = new ToyType();
+    std::shared_ptr<Toy> typedToy = std::shared_ptr<Toy>(new ToyType());
     if (lex.GetNext(str, lineCount).type != OPEN_PARENTHESIS)
         return syntaxError("Expected opening parenthesis in " + typedToy->Name() + " operation");
     for (int i = 0; i < arguments; i++) {
@@ -76,21 +80,21 @@ bool Parser::parseNAryOperation(std::string& str, Toy* toy, int arguments) {
     return true;
 }
 template <typename ToyType>
-bool Parser::parseUnaryOperation(std::string& str, Toy* toy) {
+bool Parser::parseUnaryOperation(std::string& str, std::shared_ptr<Toy> toy) {
     return parseNAryOperation<ToyType>(str, toy, 1);
 }
 template <typename ToyType>
-bool Parser::parseBinaryOperation(std::string& str, Toy* toy) {
+bool Parser::parseBinaryOperation(std::string& str, std::shared_ptr<Toy> toy) {
     return parseNAryOperation<ToyType>(str, toy, 2);
 }
 template <typename ToyType>
-bool Parser::parseTrinaryOperation(std::string& str, Toy* toy) {
+bool Parser::parseTrinaryOperation(std::string& str, std::shared_ptr<Toy> toy) {
     return parseNAryOperation<ToyType>(str, toy, 3);
 }
 template <typename ToyType>
-bool Parser::parseExpandingSizeOperation(std::string& str, Toy* toy) {
+bool Parser::parseExpandingSizeOperation(std::string& str, std::shared_ptr<Toy> toy) {
     Lexer lex;
-    Toy* typedToy = new ToyType();
+    std::shared_ptr<Toy> typedToy = std::shared_ptr<Toy>(new ToyType());
     if (lex.GetNext(str, lineCount).type != OPEN_PARENTHESIS)
         return syntaxError("Expected opening parenthesis in " + typedToy->Name() + " operation");
     // at least one argument is required
@@ -108,15 +112,15 @@ bool Parser::parseExpandingSizeOperation(std::string& str, Toy* toy) {
     return true;
 }
 
-bool Parser::parseToy(std::string& str, Toy* toy) {
+bool Parser::parseToy(std::string& str, std::shared_ptr<Toy> toy) {
     Lexer lex;
     Token next = lex.GetNext(str, lineCount);
     if (next.type == IDENTIFIER) {
         if (next.value == "uv") {
-            toy->AddChild(new LitUV());
+            toy->AddChild(std::shared_ptr<Toy>(new LitUV()));
             return true;
         } else if (next.value == "time") {
-            toy->AddChild(new LitTime());
+            toy->AddChild(std::shared_ptr<Toy>(new LitTime()));
             return true;
         } else if (next.value == "frac" || next.value == "fract" || next.value == "fraction" || next.value == "remainder") {
             return parseUnaryOperation<Fract>(str, toy);
@@ -202,10 +206,10 @@ bool Parser::parseToy(std::string& str, Toy* toy) {
             return syntaxError("Unknown identifier: " + next.value);
     } else if (next.type == NUMBER) {
         float number = std::atof(next.value.c_str());
-        LitNumber* litNum = new LitNumber();
+        std::shared_ptr<LitNumber> litNum = std::shared_ptr<LitNumber>(new LitNumber());
         litNum->SetNumber(number);
         toy->AddChild(litNum);
-        return litNum;
+        return true;
     }
     if (next.type == OPEN_PARENTHESIS) { // empty parenthesis are legal
         // In the case of ()
@@ -222,22 +226,22 @@ bool Parser::parseToy(std::string& str, Toy* toy) {
     return syntaxError("Unexpected symbol: " + next.ToString());
 }
 
-bool Parser::parseStatement(std::string& str, Toy* toy) {
+bool Parser::parseStatement(std::string& str, std::shared_ptr<Toy> toy) {
     Lexer lex;
-    Toy* temp = new Toy();
+    std::shared_ptr<Toy> temp = std::shared_ptr<Toy>(new Toy());
     if (!parseToy(str, temp))
         return false;
 
     // Only peek: we don't always expect a .? but we want one.
     if (lex.PeekNext(str).type == AXIS) {
         std::string axis = lex.GetNext(str, lineCount).value;
-        Toy* returnToy;
+        std::shared_ptr<Toy> returnToy;
         if (axis[1] == 'x' || axis[1] == 'r' || axis[1] == 'u')
-            returnToy = new X();
+            returnToy = std::shared_ptr<Toy>(new X());
         else if (axis[1] == 'y' || axis[1] == 'g' || axis[1] == 'v')
-            returnToy = new Y();
+            returnToy = std::shared_ptr<Toy>(new Y());
         else if (axis[1] == 'z' || axis[1] == 'b')
-            returnToy = new Z();
+            returnToy = std::shared_ptr<Toy>(new Z());
         returnToy->AddChild(temp->GetChild(0));
         toy->AddChild(returnToy);
         return true;
@@ -249,21 +253,21 @@ bool Parser::parseStatement(std::string& str, Toy* toy) {
     return true;
 }
 
-bool Parser::parseMathematicalOperator(std::string& str, Toy* toy, Toy* first) {
+bool Parser::parseMathematicalOperator(std::string& str, std::shared_ptr<Toy> toy, std::shared_ptr<Toy> first) {
     Lexer lex;
 
     std::string op = lex.GetNext(str, lineCount).value;
-    Toy* returnToy;
+    std::shared_ptr<Toy> returnToy;
     if (op == "+")
-        returnToy = new Add();
+        returnToy = std::shared_ptr<Toy>(new Add());
     else if (op == "-")
-        returnToy = new Subtract();
+        returnToy = std::shared_ptr<Toy>(new Subtract());
     else if (op == "*")
-        returnToy = new Multiply();
+        returnToy = std::shared_ptr<Toy>(new Multiply());
     else if (op == "/")
-        returnToy = new Divide();
+        returnToy = std::shared_ptr<Toy>(new Divide());
 
-    Toy* second = new Toy();
+    std::shared_ptr<Toy> second = std::shared_ptr<Toy>(new Toy());
     if (!parseStatement(str, second))
         return syntaxError("No operand to the right of " + op);
 
@@ -275,12 +279,12 @@ bool Parser::parseMathematicalOperator(std::string& str, Toy* toy, Toy* first) {
 }
 
 void Parser::PrintAST() {
-    std::cout << document.Name() << std::endl;
-    if (!document.Empty())
-        printToy(document.GetChild(0), true, "");
+    std::cout << document->Name() << std::endl;
+    if (!document->Empty())
+        printToy(document->GetChild(0), true, "");
 }
 
-void Parser::printToy(Toy* toy, bool last, std::string pre) {
+void Parser::printToy(std::shared_ptr<Toy> toy, bool last, std::string pre) {
 #ifdef _WIN32
     const char BAR = char(179) /*│*/, MIDDLE = char(195) /*├*/, LAST = char(192) /*└*/, DASH = char(196) /*─*/;
 #elif __linux__ // WSL wouldn't print Extended ASCII characters right. They might work on an actual Linux operating system, I'm not sure.
