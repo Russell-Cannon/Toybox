@@ -304,9 +304,7 @@ std::string SmoothStep::GenerateGLSL() {
 std::string Line::Name() { return "Line"; }
 std::string Line::GenerateGLSL() {
     Trinary::GenerateGLSL();
-    // Credit
     // https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line#Line_defined_by_an_equation
-    // for equation
 
     std::string uv = children[0]->GenerateGLSL();
     std::string p1 = children[1]->GenerateGLSL();
