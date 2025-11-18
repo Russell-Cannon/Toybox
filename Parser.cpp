@@ -26,31 +26,48 @@ void Parser::Parse(std::string str) {
     std::string temp = str;
     int tempLinecount = 0;
 
-    Token next = lex.GetNext(temp, tempLinecount);
-    // check for equals
-    // check for identifier
-    if (next.type == IDENTIFIER) {
-        // At this point we could either already be in the expression or in an assignment
-        if (lex.PeekNext(temp).type == EQUALS) {            // We now know we are in an assignment
-            Token identifier = lex.GetNext(str, lineCount); // start reading for real. We know this is an identifier
-            lex.GetNext(str, lineCount);                    // We know this will be an EQUALS. Throw it away
-
-            // We have at least one assignment.
-            if (lex.PeekNext(str).type == FILEPATH) { // We have a texture assignment
-                // #TODO add support for arbitrary names for files
-                if (identifier.value == "texture") {
-                    TexturePath = lex.GetNext(str, lineCount).value;
-                }
-            } else {
-                syntaxError("Attempted to assign something other than a filepath (" + lex.PeekNext(str).ToString() + ") to a variable. No support yet.");
-            }
-            // #TODO put logic here for reading functions or variables
-            // #TODO check for program deliminator to allow for multiple assignments
-        } // else: fall back to ParseStatement
+    int n = 0; // temp line count
+    while (isAssignment(str)) {
+        parseAssignment(str);
     }
 
     // start parsing statement
     parseStatement(str, document);
+}
+
+bool Parser::isAssignment(std::string str) {
+    Lexer lex;
+    Token id = lex.GetNext(str, lineCount);
+    if (id.type != IDENTIFIER)
+        return false;
+
+    if (lex.GetNext(str, lineCount).type != EQUALS)
+        return false;
+
+    Token operand = lex.GetNext(str, lineCount);
+    if (operand.type == FILEPATH) { // We have a texture assignment
+        // #TODO add support for arbitrary names for files
+        if (id.value == "texture") return true;
+    } 
+    return syntaxError("Attempted to assign something other than a filepath (" + operand.ToString() + ") to a variable. No support yet.");
+    // #TODO put logic here for reading functions or variables
+    // #TODO check for program deliminator to allow for multiple assignments
+}
+
+void Parser::parseAssignment(std::string& str) {
+    Lexer lex;
+    Token id = lex.GetNext(str, lineCount);
+    lex.GetNext(str, lineCount); //.type == EQUALS
+
+    Token operand = lex.GetNext(str, lineCount);
+    if (operand.type == FILEPATH) { // We have a texture assignment
+        // #TODO add support for arbitrary names for files
+        if (id.value == "texture") {
+            TexturePath = operand.value;
+        }
+    } else {
+        syntaxError("Attempted to assign something other than a filepath (" + lex.PeekNext(str).ToString() + ") to a variable. No support yet.");
+    }
 }
 
 std::string Parser::GenerateGLSL() {

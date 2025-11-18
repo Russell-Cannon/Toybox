@@ -26,6 +26,8 @@ class Parser {
     bool parseExpandingSizeOperation(std::string& str, std::shared_ptr<Toy> toy);
     bool parseToy(std::string& str, std::shared_ptr<Toy> toy);
     bool parseStatement(std::string& str, std::shared_ptr<Toy> toy);
+    bool isAssignment(std::string str);
+    void parseAssignment(std::string& str);
     bool parseMathematicalOperator(std::string& str, std::shared_ptr<Toy> toy, std::shared_ptr<Toy> first);
 
     void printToy(std::shared_ptr<Toy> toy, bool last, std::string pre);
