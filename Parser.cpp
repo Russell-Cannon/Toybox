@@ -16,6 +16,10 @@ bool Parser::syntaxError(std::string message) {
     std::cerr << filename << ':' << lineCount << " : " << message << '\n';
     return false;
 }
+bool Parser::semanticError(std::string message) {
+    std::cerr << filename << ':' << lineCount << " : " << message << '\n';
+    return false;
+}
 
 std::string Parser::GetTextureFilePath() const {
     return TexturePath;
@@ -26,7 +30,6 @@ void Parser::Parse(std::string str) {
     std::string temp = str;
     int tempLinecount = 0;
 
-    int n = 0; // temp line count
     while (isAssignment(str)) {
         parseAssignment(str);
     }
@@ -44,30 +47,36 @@ bool Parser::isAssignment(std::string str) {
     if (lex.GetNext(str, lineCount).type != EQUALS)
         return false;
 
-    Token operand = lex.GetNext(str, lineCount);
-    if (operand.type == FILEPATH) { // We have a texture assignment
-        // #TODO add support for arbitrary names for files
-        if (id.value == "texture") return true;
-    } 
-    return syntaxError("Attempted to assign something other than a filepath (" + operand.ToString() + ") to a variable. No support yet.");
-    // #TODO put logic here for reading functions or variables
-    // #TODO check for program deliminator to allow for multiple assignments
+    //could assign a quilt or a filepath
+    // Token operand = lex.GetNext(str, lineCount);
+    // if (operand.type == FILEPATH)
+        return true;
+    // return syntaxError("Attempted to assign something other than a filepath (" + operand.ToString() + ") to a variable. No support yet.");
 }
 
-void Parser::parseAssignment(std::string& str) {
+bool Parser::parseAssignment(std::string& str) {
     Lexer lex;
     Token id = lex.GetNext(str, lineCount);
     lex.GetNext(str, lineCount); //.type == EQUALS
 
     Token operand = lex.GetNext(str, lineCount);
-    if (operand.type == FILEPATH) { // We have a texture assignment
-        // #TODO add support for arbitrary names for files
+    if (operand.type == FILEPATH) {
+        // #TODO add support for arbitrary texture names
         if (id.value == "texture") {
             TexturePath = operand.value;
-        }
-    } else {
-        syntaxError("Attempted to assign something other than a filepath (" + lex.PeekNext(str).ToString() + ") to a variable. No support yet.");
+            return true;
+        } //else:
+        return semanticError("Attempted to assign a filepath to a variable not named texture.");
     }
+    //Undo stealing that operand
+    str = operand.value + ' ' + str;
+    std::shared_ptr<Toy> holder = std::shared_ptr<Toy>(new Toy);
+    if (parseStatement(str, holder)) {
+        symbolTable[id.value] = holder->GetChild(0);
+        return true;
+    }
+
+    return semanticError("Expected a valid Toybox statement or filepath after equals. Got: " + operand.ToString() + " instead.");
 }
 
 std::string Parser::GenerateGLSL() {
@@ -219,8 +228,11 @@ bool Parser::parseToy(std::string& str, std::shared_ptr<Toy> toy) {
             return parseTrinaryOperation<LineSegment>(str, toy);
         } else if (next.value == "avg" || next.value == "average") {
             return parseExpandingSizeOperation<Average>(str, toy);
-        } else
-            return syntaxError("Unknown identifier: " + next.value);
+        
+        } else if (symbolTable.find(next.value) != symbolTable.end()) { //id exists as key in symbol table
+            toy->AddChild(symbolTable[next.value]);
+            return true;
+        } else return syntaxError("Unknown identifier: " + next.value);
     } else if (next.type == NUMBER) {
         float number = std::atof(next.value.c_str());
         std::shared_ptr<LitNumber> litNum = std::shared_ptr<LitNumber>(new LitNumber());
@@ -293,6 +305,13 @@ bool Parser::parseMathematicalOperator(std::string& str, std::shared_ptr<Toy> to
     toy->AddChild(returnToy);
 
     return true;
+}
+
+void Parser::PrintSymbolTable() {
+    for (std::pair<std::string, std::shared_ptr<Toy>> p : symbolTable) {
+        std::cout << p.first << std::endl;
+        printToy(p.second, true, "");
+    }
 }
 
 void Parser::PrintAST() {

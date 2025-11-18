@@ -15,10 +15,8 @@ Lexer.o:	Lexer.h	Lexer.cpp	Types.h
 	g++ -g -c Lexer.cpp
 
 
-run:	Toybox
+run:	Toybox.exe
 	./Toybox
 
 clean:
 	del *.exe *.o out.html
-
-#oneliner: g++ -g -c Toybox.cpp Toy.cpp Parser.cpp Lexer.cpp; g++ -g -o Toybox Toybox.cpp Toy.o Parser.o Lexer.o; ./Toybox FlagWave.tb

@@ -8,11 +8,13 @@
 
 class Parser {
     std::shared_ptr<Toy> document;
-    std::string filename;
+    std::map<std::string, std::shared_ptr<Toy>> symbolTable;
+    std::string filename = "";
     int lineCount = 1;
     std::string TexturePath = "./checker-map.png";
 
     bool syntaxError(std::string message);
+    bool semanticError(std::string message);
 
     template <typename ToyType>
     bool parseNAryOperation(std::string& str, std::shared_ptr<Toy> toy, int arguments);
@@ -27,7 +29,7 @@ class Parser {
     bool parseToy(std::string& str, std::shared_ptr<Toy> toy);
     bool parseStatement(std::string& str, std::shared_ptr<Toy> toy);
     bool isAssignment(std::string str);
-    void parseAssignment(std::string& str);
+    bool parseAssignment(std::string& str);
     bool parseMathematicalOperator(std::string& str, std::shared_ptr<Toy> toy, std::shared_ptr<Toy> first);
 
     void printToy(std::shared_ptr<Toy> toy, bool last, std::string pre);
@@ -41,4 +43,5 @@ class Parser {
     std::string GetTextureFilePath() const;
 
     void PrintAST();
+    void PrintSymbolTable();
 };

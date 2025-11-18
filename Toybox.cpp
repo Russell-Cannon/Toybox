@@ -22,6 +22,7 @@ int main(int argc, char* argv[]) {
     Parser parser(filename);
 
     parser.Parse(buffer.str());
+    parser.PrintSymbolTable();
     parser.PrintAST();
 
     std::ifstream scaffold("in.html");

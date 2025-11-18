@@ -9,7 +9,7 @@ Lexer::Lexer() {}
 Token Lexer::GetNext(std::string& str, int& _lineCount) {
     std::smatch match;
 
-    while (str.length() > 0 && (str[0] == ' ' || str[0] == '\n' || str[0] == '\t' || str[0] == 13)) {
+    while (str.length() > 0 && (str[0] == ' ' || str[0] == '\n' || str[0] == '\t' || str[0] == ';' || str[0] == 13)) {
         if (str[0] == '\n')
             _lineCount++;
         str = str.substr(1);
