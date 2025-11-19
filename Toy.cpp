@@ -94,7 +94,13 @@ std::string Texture::Name() { return "Texture"; }
 std::string Texture::GenerateGLSL() {
     Unary::GenerateGLSL();
     std::string childOutput = children[0]->GenerateGLSL();
-    return "texture(u_texture, vec2(" + childOutput + ".x, -" + childOutput + ".y)).xyz";
+    return "texture(u_texture" + std::to_string(textureID) + ", vec2(" + childOutput + ".x, -" + childOutput + ".y)).xyz";
+}
+void Texture::SetTextureID(int i) {
+    textureID = i;
+}
+int Texture::GetTextureID() const {
+    return textureID;
 }
 
 std::string Ceiling::Name() { return "Ceiling"; }

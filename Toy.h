@@ -95,6 +95,10 @@ class Texture : public Unary {
   public:
     std::string Name();
     std::string GenerateGLSL();
+    void SetTextureID(int i);
+    int GetTextureID() const;
+  protected:
+    int textureID = 0;
 };
 class Ceiling : public Unary {
   public:

@@ -8,10 +8,10 @@
 
 class Parser {
     std::shared_ptr<Toy> document;
-    std::map<std::string, std::shared_ptr<Toy>> symbolTable;
+    std::map<std::string, std::pair<bool, std::shared_ptr<Toy>>> symbolTable;
     std::string filename = "";
     int lineCount = 1;
-    std::string TexturePath = "./checker-map.png";
+    std::vector<std::string> texturePaths = {"./checker-map.png"};
 
     bool syntaxError(std::string message);
     bool semanticError(std::string message);
@@ -40,7 +40,9 @@ class Parser {
 
     void Parse(std::string str);
     std::string GenerateGLSL();
-    std::string GetTextureFilePath() const;
+    std::string GetTextureFilePath(int i) const;
+    int GetNumTextures() const;
+    void AddTexture(std::string _filename);
 
     void PrintAST();
     void PrintSymbolTable();

@@ -40,7 +40,9 @@ int main(int argc, char* argv[]) {
             if (command == "output$") {
                 fout << parser.GenerateGLSL();
             } else if (command == "texture$") {
-                fout << parser.GetTextureFilePath();
+                for (int i = 0; i < parser.GetNumTextures(); i++) {
+                    fout << "createTexture(\"" << parser.GetTextureFilePath(i) << "\");\n";
+                }
             }
 
             scaffold.get(c); // get next character after closing $

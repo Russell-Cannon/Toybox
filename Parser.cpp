@@ -21,8 +21,20 @@ bool Parser::semanticError(std::string message) {
     return false;
 }
 
-std::string Parser::GetTextureFilePath() const {
-    return TexturePath;
+std::string Parser::GetTextureFilePath(int i) const {
+    return texturePaths[i];
+}
+
+int Parser::GetNumTextures() const {
+    return texturePaths.size();
+}
+
+void Parser::AddTexture(std::string _filename) {
+    if (GetNumTextures() == 8) {
+        semanticError("Attempted to add a ninth texture. GLSL only supports eight or less textures.");
+        return;
+    }
+    texturePaths.push_back(_filename);
 }
 
 void Parser::Parse(std::string str) {
@@ -61,18 +73,24 @@ bool Parser::parseAssignment(std::string& str) {
 
     Token operand = lex.GetNext(str, lineCount);
     if (operand.type == FILEPATH) {
-        // #TODO add support for arbitrary texture names
-        if (id.value == "texture") {
-            TexturePath = operand.value;
-            return true;
-        } //else:
-        return semanticError("Attempted to assign a filepath to a variable not named texture.");
+        if (id.value == "texture") { //redefining texture globally
+            texturePaths[0] = operand.value;
+        } else { //assigning a texture to variable
+            //create a new texture toy
+            Texture* t = new Texture();
+            t->SetTextureID(GetNumTextures()); //set its id to this end of the list
+            symbolTable[id.value] = {true, std::shared_ptr<Toy>(t)};
+
+            //add that texture to the list
+            AddTexture(operand.value);
+        }
+        return true;
     }
     //Undo stealing that operand
     str = operand.value + ' ' + str;
     std::shared_ptr<Toy> holder = std::shared_ptr<Toy>(new Toy);
     if (parseStatement(str, holder)) {
-        symbolTable[id.value] = holder->GetChild(0);
+        symbolTable[id.value] = {false, holder->GetChild(0)};
         return true;
     }
 
@@ -215,7 +233,15 @@ bool Parser::parseToy(std::string& str, std::shared_ptr<Toy> toy) {
             return parseExpandingSizeOperation<Average>(str, toy);
         
         } else if (symbolTable.find(next.value) != symbolTable.end()) { //id exists as key in symbol table
-            toy->AddChild(symbolTable[next.value]);
+            bool function = symbolTable[next.value].first;
+            if (function) {
+                parseUnaryOperation<Texture>(str, toy);
+                Texture* text = (Texture*)toy->GetChild(0).get(); //get the texture we just added.
+                Texture* symbolTexture = (Texture*)symbolTable[next.value].second.get(); //get the texture from the symbol table.
+                text->SetTextureID(symbolTexture->GetTextureID()); //set the texture id in the new texture to the id from the old one.
+            } else {
+                toy->AddChild(symbolTable[next.value].second); //add constant variable
+            }
             return true;
         } else {
             return syntaxError("Unknown identifier: " + next.value);
@@ -295,9 +321,9 @@ bool Parser::parseMathematicalOperator(std::string& str, std::shared_ptr<Toy> to
 }
 
 void Parser::PrintSymbolTable() {
-    for (std::pair<std::string, std::shared_ptr<Toy>> p : symbolTable) {
+    for (std::pair<std::string, std::pair<bool, std::shared_ptr<Toy>>> p : symbolTable) {
         std::cout << p.first << std::endl;
-        printToy(p.second, true, "");
+        printToy(p.second.second, true, "");
     }
 }
 
