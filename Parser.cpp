@@ -148,9 +148,9 @@ bool Parser::parseToy(std::string& str, std::shared_ptr<Toy> toy) {
         } else if (next.value == "time") {
             toy->AddChild(std::shared_ptr<Toy>(new LitTime()));
             return true;
-        } else if (next.value == "frac" || next.value == "fract" || next.value == "fraction" || next.value == "remainder") {
+        } else if (next.value == "fract") {
             return parseUnaryOperation<Fract>(str, toy);
-        } else if (next.value == "saw" || next.value == "sawtooth" || next.value == "mirror") {
+        } else if (next.value == "mirror") {
             return parseUnaryOperation<SawTooth>(str, toy);
         } else if (next.value == "sin") {
             return parseUnaryOperation<Sin>(str, toy);
@@ -158,81 +158,68 @@ bool Parser::parseToy(std::string& str, std::shared_ptr<Toy> toy) {
             return parseUnaryOperation<Cos>(str, toy);
         } else if (next.value == "tan") {
             return parseUnaryOperation<Tan>(str, toy);
-        } else if (next.value == "normalize" || next.value == "normalized" || next.value == "normal") {
+        } else if (next.value == "normalize") {
             return parseUnaryOperation<Normalize>(str, toy);
-        } else if (next.value == "length" || next.value == "magnitude" || next.value == "len") {
+        } else if (next.value == "length") {
             return parseUnaryOperation<Length>(str, toy);
-        } else if (next.value == "text" || next.value == "texture") {
+        } else if (next.value == "texture") {
             return parseUnaryOperation<Texture>(str, toy);
-        } else if (next.value == "ceil" || next.value == "ceiling") {
+        } else if (next.value == "ceil") {
             return parseUnaryOperation<Ceiling>(str, toy);
         } else if (next.value == "floor") {
             return parseUnaryOperation<Floor>(str, toy);
         } else if (next.value == "round") {
             return parseUnaryOperation<Round>(str, toy);
-        } else if (next.value == "neg" || next.value == "negate") {
-            return parseUnaryOperation<Negate>(str, toy);
-        } else if (next.value == "abs" || next.value == "absolute") {
+        } else if (next.value == "abs") {
             return parseUnaryOperation<Absolute>(str, toy);
-        } else if (next.value == "x") {
-            return parseUnaryOperation<X>(str, toy);
-        } else if (next.value == "y") {
-            return parseUnaryOperation<Y>(str, toy);
-        } else if (next.value == "z") {
-            return parseUnaryOperation<Z>(str, toy);
+        } else if (next.value == "negate") {
+            return parseUnaryOperation<Negate>(str, toy);
         } else if (next.value == "screen") {
             return parseUnaryOperation<Screen>(str, toy);
-        } else if (next.value == "random" || next.value == "rand") {
+        } else if (next.value == "random") {
             return parseUnaryOperation<Random>(str, toy);
         } else if (next.value == "noise") {
             return parseUnaryOperation<Noise>(str, toy);
-        }
 
-        else if (next.value == "mul" || next.value == "mult" || next.value == "multiply") {
-            return parseBinaryOperation<Multiply>(str, toy);
-        } else if (next.value == "div" || next.value == "divide") {
-            return parseBinaryOperation<Divide>(str, toy);
-        } else if (next.value == "add") {
-            return parseBinaryOperation<Add>(str, toy);
-        } else if (next.value == "sub" || next.value == "subtract") {
-            return parseBinaryOperation<Subtract>(str, toy);
-        } else if (next.value == "mod" || next.value == "modulus" || next.value == "modulo") {
+        } else if (next.value == "mod") {
             return parseBinaryOperation<Modulus>(str, toy);
-        } else if (next.value == "step" || next.value == "if") {
+        } else if (next.value == "step") {
             return parseBinaryOperation<Step>(str, toy);
-        } else if (next.value == "polygon" || next.value == "poly") {
+        } else if (next.value == "polygon") {
             return parseBinaryOperation<NGon>(str, toy);
         } else if (next.value == "dot") {
             return parseBinaryOperation<Dot>(str, toy);
         } else if (next.value == "cross") {
             return parseBinaryOperation<Cross>(str, toy);
-        } else if (next.value == "distance" || next.value == "dist") {
+        } else if (next.value == "distance") {
             return parseBinaryOperation<Distance>(str, toy);
-        } else if (next.value == "direction" || next.value == "dir") {
+        } else if (next.value == "direction") {
             return parseBinaryOperation<Direction>(str, toy);
         } else if (next.value == "circle") {
             return parseBinaryOperation<Circle>(str, toy);
         }
 
-        else if (next.value == "com" || next.value == "comb" || next.value == "combine") {
+        else if (next.value == "combine") {
             return parseTrinaryOperation<Combine>(str, toy);
         } else if (next.value == "clamp") {
             return parseTrinaryOperation<Clamp>(str, toy);
-        } else if (next.value == "mix" || next.value == "lerp") {
+        } else if (next.value == "mix") {
             return parseTrinaryOperation<Mix>(str, toy);
         } else if (next.value == "smoothstep") {
             return parseTrinaryOperation<SmoothStep>(str, toy);
         } else if (next.value == "line") {
             return parseTrinaryOperation<Line>(str, toy);
-        } else if (next.value == "linesegment" || next.value == "segment") {
+        } else if (next.value == "linesegment") {
             return parseTrinaryOperation<LineSegment>(str, toy);
-        } else if (next.value == "avg" || next.value == "average") {
+        } else if (next.value == "average") {
             return parseExpandingSizeOperation<Average>(str, toy);
         
         } else if (symbolTable.find(next.value) != symbolTable.end()) { //id exists as key in symbol table
             toy->AddChild(symbolTable[next.value]);
             return true;
-        } else return syntaxError("Unknown identifier: " + next.value);
+        } else {
+            return syntaxError("Unknown identifier: " + next.value);
+        }
     } else if (next.type == NUMBER) {
         float number = std::atof(next.value.c_str());
         std::shared_ptr<LitNumber> litNum = std::shared_ptr<LitNumber>(new LitNumber());
@@ -269,7 +256,7 @@ bool Parser::parseStatement(std::string& str, std::shared_ptr<Toy> toy) {
             returnToy = std::shared_ptr<Toy>(new X());
         else if (axis[1] == 'y' || axis[1] == 'g' || axis[1] == 'v')
             returnToy = std::shared_ptr<Toy>(new Y());
-        else if (axis[1] == 'z' || axis[1] == 'b')
+        else if (axis[1] == 'z' || axis[1] == 'b' || axis[1] == 'w')
             returnToy = std::shared_ptr<Toy>(new Z());
         returnToy->AddChild(temp->GetChild(0));
         toy->AddChild(returnToy);
