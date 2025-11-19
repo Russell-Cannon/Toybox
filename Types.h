@@ -44,6 +44,7 @@ const TokenType
 
 // List of tokens which are checked against
 const TokenType TokenTypes[] = {
+    AXIS,
     IDENTIFIER,
     FILEPATH,
     OPEN_PARENTHESIS,
@@ -52,4 +53,4 @@ const TokenType TokenTypes[] = {
     NUMBER,
     OPERATOR,
     EQUALS,
-    AXIS};
+};

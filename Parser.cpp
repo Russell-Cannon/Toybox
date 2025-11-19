@@ -284,11 +284,16 @@ bool Parser::parseStatement(std::string& str, std::shared_ptr<Toy> toy) {
             returnToy = std::shared_ptr<Toy>(new Y());
         else if (axis[1] == 'z' || axis[1] == 'b' || axis[1] == 'w')
             returnToy = std::shared_ptr<Toy>(new Z());
-        returnToy->AddChild(temp->GetChild(0));
-        toy->AddChild(returnToy);
-        return true;
+        returnToy->AddChild(temp->GetChild(0)); //add the inner expression to an X/Y/Z toy to take its dimension.
+        //catch cases where an axis is operated on
+        if (lex.PeekNext(str).type == OPERATOR)
+            return parseMathematicalOperator(str, toy, returnToy); //
+        else {
+            toy->AddChild(returnToy); //Add this new toy (an X/Y/Z with the original expression inside) to the given toy
+            return true; 
+        }
     } else if (lex.PeekNext(str).type == OPERATOR) {
-        return parseMathematicalOperator(str, toy, temp);
+        return parseMathematicalOperator(str, toy, temp->GetChild(0));
     }
 
     toy->AddChild(temp->GetChild(0));
@@ -313,7 +318,7 @@ bool Parser::parseMathematicalOperator(std::string& str, std::shared_ptr<Toy> to
     if (!parseStatement(str, second))
         return syntaxError("No operand to the right of " + op);
 
-    returnToy->AddChild(first->GetChild(0));
+    returnToy->AddChild(first);
     returnToy->AddChild(second->GetChild(0));
     toy->AddChild(returnToy);
 
