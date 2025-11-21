@@ -15,8 +15,13 @@ class SymbolTable {
   protected:
     std::map<std::string, std::shared_ptr<Toy>> constTable; // Maps constant variable name to shape
     std::map<std::string, Function> functionTable;          // Maps function name to shape and parameters
-    std::map<std::string, int> textureTable;                // Maps texture name to ID.
+    std::map<std::string, std::string> textureTable;        // Maps texture name to filepath.
+
   public:
+    SymbolTable() {
+        textureTable["texture"] = "./checker-map.png";
+    }
+
     bool Exists(std::string key) {
         return IsConstant(key) | IsFunction(key) | IsTexture(key);
     }
@@ -35,7 +40,7 @@ class SymbolTable {
     Function GetFunction(std::string key) {
         return functionTable[key];
     }
-    int GetTextureID(std::string key) {
+    std::string GetTexture(std::string key) {
         return textureTable[key];
     }
 
@@ -49,10 +54,10 @@ class SymbolTable {
             std::cerr << "Attempted to add " << key << " twice to function table.\n";
         functionTable[key] = function;
     }
-    void Insert(std::string key, int id) {
-        if (IsTexture(key))
+    void Insert(std::string key, std::string texture) {
+        if (key != "texture" && IsTexture(key))
             std::cerr << "Attempted to add " << key << " twice to texture table.\n";
-        textureTable[key] = id;
+        textureTable[key] = texture;
     }
 
     void Remove(std::string key) {
@@ -64,8 +69,12 @@ class SymbolTable {
             textureTable.erase(key);
     }
 
+    const std::map<std::string, std::string>& GetTexturesTable() const {
+        return textureTable;
+    }
+
     void Print() {
-        for (std::pair<std::string, int> t : textureTable) {
+        for (std::pair<std::string, std::string> t : textureTable) {
             std::cout << t.first << ": " << t.second << '\n';
         }
         for (std::pair<std::string, std::shared_ptr<Toy>> c : constTable) {

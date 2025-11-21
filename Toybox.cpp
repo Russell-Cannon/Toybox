@@ -40,8 +40,19 @@ int main(int argc, char* argv[]) {
             if (command == "output$") {
                 fout << parser.GenerateGLSL();
             } else if (command == "texture$") {
-                for (int i = 0; i < parser.GetNumTextures(); i++) {
-                    fout << "createTexture(\"" << parser.GetTextureFilePath(i) << "\");\n";
+                for (std::pair<std::string, std::string> t : parser.GetTextures()) {
+                    fout << "createTexture(\"" << t.second << "\");\n";
+                }
+            } else if (command == "uniformtextures$") {
+                for (std::pair<std::string, std::string> t : parser.GetTextures()) {
+                    fout << "uniform sampler2D u_texture_" << t.first << ";\n";
+                }
+            } else if (command == "bindtextures$") {
+                int i = 0;
+                for (std::pair<std::string, std::string> t : parser.GetTextures()) {
+                    fout << "let iTextureLoc" << t.first << " = gl.getUniformLocation(prog, \"u_texture_" << t.first << "\");\n";
+                    fout << "gl.uniform1i(iTextureLoc" << t.first << ", " << i << ");\n";
+                    i++;
                 }
             }
 

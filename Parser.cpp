@@ -24,20 +24,8 @@ bool Parser::semanticError(std::string message) {
     return false;
 }
 
-std::string Parser::GetTextureFilePath(int i) const {
-    return texturePaths[i];
-}
-
-int Parser::GetNumTextures() const {
-    return texturePaths.size();
-}
-
-void Parser::AddTexture(std::string _filename) {
-    if (GetNumTextures() == 8) {
-        semanticError("Attempted to add a ninth texture. GLSL only supports eight or less textures.");
-        return;
-    }
-    texturePaths.push_back(_filename);
+const std::map<std::string, std::string>& Parser::GetTextures() const {
+    return symbolTable.GetTexturesTable();
 }
 
 void Parser::Parse(std::string str) {
@@ -87,13 +75,7 @@ bool Parser::parseAssignment(std::string& str) {
 
     Token operand = lex.GetNext(str, lineCount);
     if (operand.type == FILEPATH) {
-        if (id.value == "texture") { // redefining texture globally
-            texturePaths[0] = operand.value;
-        } else { // assigning a texture to variable
-            symbolTable.Insert(id.value, GetNumTextures());
-            // add that texture to the list
-            AddTexture(operand.value);
-        }
+        symbolTable.Insert(id.value, operand.value);
         return true;
     }
     // Undo stealing that operand
@@ -339,8 +321,9 @@ bool Parser::parseToy(std::string& str, std::shared_ptr<Toy> toy) {
             if (symbolTable.IsTexture(next.value)) {
                 if (!parseUnaryOperation<Texture>(str, toy))
                     return false;
-                Texture* text = (Texture*)toy->GetChild(0).get();         // get the texture we just added.
-                text->SetTextureID(symbolTable.GetTextureID(next.value)); // set the texture id to the id found in the symbol table
+                Texture* text = (Texture*)toy->GetChild(0).get(); // get the texture we just added.
+                text->SetTexture(next.value);                     // set the texture id
+                return true;
             } else if (symbolTable.IsConstant(next.value)) {
                 toy->AddChild(symbolTable.GetConstant(next.value)); // add constant variable
                 return true;

@@ -7,13 +7,13 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 class Parser {
     std::shared_ptr<Toy> document;
     SymbolTable symbolTable;
     std::string filename = "";
     int lineCount = 1;
-    std::vector<std::string> texturePaths = {"./checker-map.png"};
 
     bool syntaxError(std::string message);
     bool semanticError(std::string message);
@@ -44,9 +44,7 @@ class Parser {
 
     void Parse(std::string str);
     std::string GenerateGLSL();
-    std::string GetTextureFilePath(int i) const;
-    int GetNumTextures() const;
-    void AddTexture(std::string _filename);
+    const std::map<std::string, std::string>& GetTextures() const;
 
     void PrintAST();
     void PrintSymbolTable();

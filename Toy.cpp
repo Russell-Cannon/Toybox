@@ -169,19 +169,27 @@ std::string Length::GenerateGLSL() {
 }
 CLONE(Length)
 
-std::string Texture::Name() { return "Texture"; }
+std::string Texture::Name() { return "Texture (" + textureName + ")"; }
 std::string Texture::GenerateGLSL() {
     Unary::GenerateGLSL();
     std::string childOutput = children[0]->GenerateGLSL();
-    return "texture(u_texture" + std::to_string(textureID) + ", vec2(" + childOutput + ".x, -" + childOutput + ".y)).xyz";
+    return "texture(u_texture_" + textureName + ", vec2(" + childOutput + ".x, -" + childOutput + ".y)).xyz";
 }
-void Texture::SetTextureID(int i) {
-    textureID = i;
+void Texture::SetTexture(std::string i) {
+    textureName = i;
 }
-int Texture::GetTextureID() const {
-    return textureID;
+std::string Texture::GetTexture() const {
+    return textureName;
 }
-CLONE(Texture)
+std::shared_ptr<Toy> Texture::Clone() {
+    Texture* text = new Texture();
+    text->SetTexture(GetTexture());
+    std::shared_ptr<Toy> clone = std::shared_ptr<Toy>(text);
+    for (int i = 0; i < children.size(); i++) {
+        clone->AddChild(GetChild(i)->Clone());
+    }
+    return clone;
+}
 
 std::string Ceiling::Name() { return "Ceiling"; }
 std::string Ceiling::GenerateGLSL() {

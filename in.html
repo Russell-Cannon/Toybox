@@ -64,14 +64,7 @@ $$texture$
             #define TWO_PI 6.28318530718
             uniform vec2 iResolution;
             uniform float time;
-            uniform sampler2D u_texture0;
-            uniform sampler2D u_texture1;
-            uniform sampler2D u_texture2;
-            uniform sampler2D u_texture3;
-            uniform sampler2D u_texture4;
-            uniform sampler2D u_texture5;
-            uniform sampler2D u_texture6;
-            uniform sampler2D u_texture7;
+            $$uniformtextures$
             out vec4 outColor;
 
             //credit https://www.shadertoy.com/view/4djSRW for hash function
@@ -105,10 +98,11 @@ $$texture$
       const iResolutionLoc = gl.getUniformLocation(prog, "iResolution");
       const iTimeLoc = gl.getUniformLocation(prog, "time");
 
-      for (let i = 0; i < 8; i++) {
-        let iTextureLoc = gl.getUniformLocation(prog, "u_texture" + String(i));
-        gl.uniform1i(iTextureLoc, i);
-      }
+      $$bindtextures$
+    //   for (let i = 0; i < 8; i++) {
+    //     let iTextureLoc = gl.getUniformLocation(prog, "u_texture" + String(i));
+    //     gl.uniform1i(iTextureLoc, i);
+    //   }
 
       let start = performance.now();
       render();

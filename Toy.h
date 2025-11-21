@@ -97,11 +97,11 @@ class Length : public Unary {
 class Texture : public Unary {
   public:
     BASE;
-    void SetTextureID(int i);
-    int GetTextureID() const;
+    void SetTexture(std::string text);
+    std::string GetTexture() const;
 
   protected:
-    int textureID = 0;
+    std::string textureName = "texture";
 };
 class Ceiling : public Unary {
   public:
