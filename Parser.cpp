@@ -1,7 +1,10 @@
 #include "Parser.h"
 #include "Toy.h"
+#include "Types.h"
 #include <iostream>
 #include <memory>
+#include <typeinfo>
+#include <vector>
 
 Parser::Parser()
     : filename("undefined") {
@@ -52,49 +55,100 @@ void Parser::Parse(std::string str) {
 
 bool Parser::isAssignment(std::string str) {
     Lexer lex;
-    Token id = lex.GetNext(str, lineCount);
+    int _lineCount = 0;
+    Token id = lex.GetNext(str, _lineCount);
     if (id.type != IDENTIFIER)
         return false;
 
-    if (lex.GetNext(str, lineCount).type != EQUALS)
-        return false;
+    Token next = lex.GetNext(str, _lineCount);
+    if (next.type == OPEN_PARENTHESIS) { // if its an open parameter: start reading the parameters
+        while (lex.PeekNext(str).type == IDENTIFIER) {
+            lex.GetNext(str, _lineCount); // throw that ID
+            if (lex.PeekNext(str).type == COMMA)
+                lex.GetNext(str, _lineCount); // throw that comma
+        }
+        if (lex.GetNext(str, _lineCount).type != CLOSE_PARENTHESIS)
+            return false;
+        return lex.GetNext(str, _lineCount).type == EQUALS;
+    }
 
-    //could assign a quilt or a filepath
-    // Token operand = lex.GetNext(str, lineCount);
-    // if (operand.type == FILEPATH)
-        return true;
-    // return syntaxError("Attempted to assign something other than a filepath (" + operand.ToString() + ") to a variable. No support yet.");
+    return next.type == EQUALS; // if there's no parenthesis: its an constant or texture assignment: return if there is an equals
 }
 
 bool Parser::parseAssignment(std::string& str) {
     Lexer lex;
     Token id = lex.GetNext(str, lineCount);
+
+    if (lex.PeekNext(str).type == OPEN_PARENTHESIS) // we have function declaration
+        return parseFunctionDeclaration(str, id.value);
+
+    // otherwise:
     lex.GetNext(str, lineCount); //.type == EQUALS
 
     Token operand = lex.GetNext(str, lineCount);
     if (operand.type == FILEPATH) {
-        if (id.value == "texture") { //redefining texture globally
+        if (id.value == "texture") { // redefining texture globally
             texturePaths[0] = operand.value;
-        } else { //assigning a texture to variable
-            //create a new texture toy
-            Texture* t = new Texture();
-            t->SetTextureID(GetNumTextures()); //set its id to this end of the list
-            symbolTable[id.value] = {true, std::shared_ptr<Toy>(t)};
-
-            //add that texture to the list
+        } else { // assigning a texture to variable
+            symbolTable.Insert(id.value, GetNumTextures());
+            // add that texture to the list
             AddTexture(operand.value);
         }
         return true;
     }
-    //Undo stealing that operand
+    // Undo stealing that operand
     str = operand.value + ' ' + str;
     std::shared_ptr<Toy> holder = std::shared_ptr<Toy>(new Toy);
     if (parseStatement(str, holder)) {
-        symbolTable[id.value] = {false, holder->GetChild(0)};
+        if (holder->NumChildren() == 0)
+            std::cerr << "Parsed empty statement!";
+        symbolTable.Insert(id.value, holder->GetChild(0));
         return true;
     }
 
     return semanticError("Expected a valid Toybox statement or filepath after equals. Got: " + operand.ToString() + " instead.");
+}
+
+bool Parser::parseFunctionDeclaration(std::string& str, std::string id) {
+    Lexer lex;
+    lex.GetNext(str, lineCount); // throw open parenthesis
+    Function function;
+
+    while (lex.PeekNext(str).type != CLOSE_PARENTHESIS) { // get all parameters
+        Token next = lex.GetNext(str, lineCount);
+        if (next.type != IDENTIFIER)
+            return syntaxError("Expected parameter inside function declaration.");
+        function.parameters.push_back(next.value);
+        if (lex.PeekNext(str).type == COMMA)
+            lex.GetNext(str, lineCount); // throw out the comma
+    }
+
+    if (lex.GetNext(str, lineCount).type != CLOSE_PARENTHESIS)
+        return syntaxError("Expected closing parenthesis after parameters in function declaration.");
+
+    if (lex.GetNext(str, lineCount).type != EQUALS)
+        return syntaxError("Expected equals sign after id and parameters in function declaration.");
+
+    // push our parameters to the symbol table
+    for (int i = 0; i < function.parameters.size(); i++) {
+        symbolTable.Insert(function.parameters[i], std::shared_ptr<Toy>(new Parameter(function.parameters[i])));
+    }
+
+    // read the expression
+    std::shared_ptr<Toy> holder = std::shared_ptr<Toy>(new Toy);
+    if (!parseStatement(str, holder))
+        return false;
+
+    // remove our parameters
+    for (int i = 0; i < function.parameters.size(); i++) {
+        symbolTable.Remove(function.parameters[i]);
+    }
+
+    // push the expression to the function table under our id
+    function.AST = holder->GetChild(0);
+    symbolTable.Insert(id, function);
+
+    return true;
 }
 
 std::string Parser::GenerateGLSL() {
@@ -154,6 +208,55 @@ bool Parser::parseExpandingSizeOperation(std::string& str, std::shared_ptr<Toy> 
         return syntaxError("Expected closing parenthesis in " + typedToy->Name() + " operation");
     toy->AddChild(typedToy);
     return true;
+}
+
+bool Parser::parseFunction(std::string& str, std::string id, std::shared_ptr<Toy> toy) {
+    Lexer lex;
+    std::vector<std::shared_ptr<Toy>> arguments;
+    Function fun = symbolTable.GetFunction(id);
+    // get arguments
+    if (lex.GetNext(str, lineCount).type != OPEN_PARENTHESIS)
+        return false;
+    while (lex.PeekNext(str).type != CLOSE_PARENTHESIS) {
+        std::shared_ptr<Toy> holder = std::shared_ptr<Toy>(new Toy);
+        if (!parseStatement(str, holder))
+            return false;
+        arguments.push_back(holder->GetChild(0));
+        if (lex.PeekNext(str).type == COMMA)
+            lex.GetNext(str, lineCount);
+    }
+    if (lex.GetNext(str, lineCount).type != CLOSE_PARENTHESIS)
+        return false;
+
+    if (arguments.size() != fun.parameters.size())
+        return semanticError("Argument list does not match number of parameters in " + id + " function.");
+
+    // go through AST and replace parameters with arguments
+    std::shared_ptr<Toy> head = fun.AST->Clone(); // this needs to be a deep copy
+    DFSAndReplace(head, head, fun.parameters, arguments);
+
+    // add fixed ast to toy
+    toy->AddChild(head);
+    return true;
+}
+
+void Parser::DFSAndReplace(std::shared_ptr<Toy> head, std::shared_ptr<Toy> last, const std::vector<std::string>& find, const std::vector<std::shared_ptr<Toy>>& replace) {
+    // if head is in find
+    if (typeid(*head.get()) == typeid(Parameter)) {
+        std::cout << head->Name() << " is a parameter shape\n";
+        Parameter* param = (Parameter*)head.get();
+        for (int i = 0; i < find.size(); i++) {
+            if (param->ID == find[i]) {
+                last->RemoveChild(head);
+                // make last point to replace
+                last->AddChild(replace[i]);
+                return;
+            }
+        }
+    }
+    // else: recurse on all children
+    for (int i = 0; i < head->NumChildren(); i++)
+        DFSAndReplace(head->GetChild(i), head, find, replace);
 }
 
 bool Parser::parseToy(std::string& str, std::shared_ptr<Toy> toy) {
@@ -231,18 +334,19 @@ bool Parser::parseToy(std::string& str, std::shared_ptr<Toy> toy) {
             return parseTrinaryOperation<LineSegment>(str, toy);
         } else if (next.value == "average") {
             return parseExpandingSizeOperation<Average>(str, toy);
-        
-        } else if (symbolTable.find(next.value) != symbolTable.end()) { //id exists as key in symbol table
-            bool function = symbolTable[next.value].first;
-            if (function) {
-                parseUnaryOperation<Texture>(str, toy);
-                Texture* text = (Texture*)toy->GetChild(0).get(); //get the texture we just added.
-                Texture* symbolTexture = (Texture*)symbolTable[next.value].second.get(); //get the texture from the symbol table.
-                text->SetTextureID(symbolTexture->GetTextureID()); //set the texture id in the new texture to the id from the old one.
-            } else {
-                toy->AddChild(symbolTable[next.value].second); //add constant variable
+
+        } else if (symbolTable.Exists(next.value)) { // id exists as key in symbol table
+            if (symbolTable.IsTexture(next.value)) {
+                if (!parseUnaryOperation<Texture>(str, toy))
+                    return false;
+                Texture* text = (Texture*)toy->GetChild(0).get();         // get the texture we just added.
+                text->SetTextureID(symbolTable.GetTextureID(next.value)); // set the texture id to the id found in the symbol table
+            } else if (symbolTable.IsConstant(next.value)) {
+                toy->AddChild(symbolTable.GetConstant(next.value)); // add constant variable
+                return true;
+            } else if (symbolTable.IsFunction(next.value)) { // key represents a function
+                return parseFunction(str, next.value, toy);
             }
-            return true;
         } else {
             return syntaxError("Unknown identifier: " + next.value);
         }
@@ -253,7 +357,7 @@ bool Parser::parseToy(std::string& str, std::shared_ptr<Toy> toy) {
         toy->AddChild(litNum);
         return true;
     }
-    if (next.type == OPEN_PARENTHESIS) { // empty parenthesis are legal
+    if (next.type == OPEN_PARENTHESIS) {
         // In the case of ()
         if (lex.PeekNext(str).type == CLOSE_PARENTHESIS)
             return false;
@@ -284,13 +388,13 @@ bool Parser::parseStatement(std::string& str, std::shared_ptr<Toy> toy) {
             returnToy = std::shared_ptr<Toy>(new Y());
         else if (axis[1] == 'z' || axis[1] == 'b' || axis[1] == 'w')
             returnToy = std::shared_ptr<Toy>(new Z());
-        returnToy->AddChild(temp->GetChild(0)); //add the inner expression to an X/Y/Z toy to take its dimension.
-        //catch cases where an axis is operated on
+        returnToy->AddChild(temp->GetChild(0)); // add the inner expression to an X/Y/Z toy to take its dimension.
+        // catch cases where an axis is operated on
         if (lex.PeekNext(str).type == OPERATOR)
-            return parseMathematicalOperator(str, toy, returnToy); //
+            return parseMathematicalOperator(str, toy, returnToy);
         else {
-            toy->AddChild(returnToy); //Add this new toy (an X/Y/Z with the original expression inside) to the given toy
-            return true; 
+            toy->AddChild(returnToy); // Add this new toy (an X/Y/Z with the original expression inside) to the given toy
+            return true;
         }
     } else if (lex.PeekNext(str).type == OPERATOR) {
         return parseMathematicalOperator(str, toy, temp->GetChild(0));
@@ -326,42 +430,11 @@ bool Parser::parseMathematicalOperator(std::string& str, std::shared_ptr<Toy> to
 }
 
 void Parser::PrintSymbolTable() {
-    for (std::pair<std::string, std::pair<bool, std::shared_ptr<Toy>>> p : symbolTable) {
-        std::cout << p.first << std::endl;
-        printToy(p.second.second, true, "");
-    }
+    symbolTable.Print();
 }
 
 void Parser::PrintAST() {
-    std::cout << document->Name() << std::endl;
+    std::cout << document->Name() << ":\n";
     if (!document->Empty())
-        printToy(document->GetChild(0), true, "");
-}
-
-void Parser::printToy(std::shared_ptr<Toy> toy, bool last, std::string pre) {
-#ifdef _WIN32
-    const char BAR = char(179) /*│*/, MIDDLE = char(195) /*├*/, LAST = char(192) /*└*/, DASH = char(196) /*─*/;
-#elif __linux__ // WSL wouldn't print Extended ASCII characters right. They might work on an actual Linux operating system, I'm not sure.
-    const char BAR = '|' /*│*/, MIDDLE = '>' /*├*/, LAST = 'L' /*└*/, DASH = '-' /*─*/;
-#endif
-    if (pre.empty())
-        pre += BAR;
-
-    // if the last character is a bar, override it with MIDDLE or LAST
-    if (pre[pre.length() - 1] == BAR) {
-        std::cout << pre.substr(0, pre.length() - 1);
-    } else
-        std::cout << pre;
-
-    if (last) {
-        std::cout << LAST;
-        pre = pre.substr(0, pre.length() - 1) + ' ';
-    } else
-        std::cout << MIDDLE;
-
-    std::cout << DASH << toy->Name() << std::endl;
-
-    for (int i = 0; i < toy->NumChildren(); i++) {
-        printToy(toy->GetChild(i), i == toy->NumChildren() - 1, pre + ' ' + BAR);
-    }
+        document->GetChild(0)->Print();
 }

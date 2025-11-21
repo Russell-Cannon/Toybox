@@ -4,7 +4,7 @@ Toybox.exe:	Toybox.o	Toy.o	Parser.o	Lexer.o	Types.h
 Toy.o:	Toy.h	Toy.cpp
 	g++ -g -c Toy.cpp
 
-Parser.o:	Parser.h	Parser.cpp	Lexer.h	Toy.h	Types.h
+Parser.o:	Parser.h	Parser.cpp	Lexer.h	Toy.h	Types.h	SymbolTable.h
 	g++ -g -c Parser.cpp
 
 Lexer.o:	Lexer.h	Lexer.cpp	Types.h

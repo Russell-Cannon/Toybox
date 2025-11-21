@@ -9,261 +9,232 @@ class Toy {
     virtual std::string Name();
     virtual std::string GenerateGLSL();
     void AddChild(std::shared_ptr<Toy> toy);
+    void RemoveChild(std::shared_ptr<Toy> toy);
     std::shared_ptr<Toy> GetChild(int n) const;
+    virtual std::shared_ptr<Toy> Clone();
     int NumChildren() const;
     bool Empty() const;
+    void Print(bool last = true, std::string pre = "");
 
   protected:
     std::vector<std::shared_ptr<Toy>> children;
 };
 
+#define BASE                    \
+    std::string Name();         \
+    std::string GenerateGLSL(); \
+    std::shared_ptr<Toy> Clone()
+
 // Literal Toys
 class LitError : public Toy {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class LitUV : public Toy {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class LitTime : public Toy {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class LitNumber : public Toy {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
     void SetNumber(const double _value);
     double GetNumber() const;
 
   protected:
     double value;
 };
+
+// Other
 class Document : public Toy {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
+};
+class Parameter : public Toy {
+  public:
+    Parameter(std::string _ID);
+    BASE;
+    std::string ID;
 };
 
 // Operations
 ////Unary
 class Unary : public Toy {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Fract : public Unary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class SawTooth : public Unary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Sin : public Unary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Cos : public Unary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Tan : public Unary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Normalize : public Unary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Length : public Unary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Texture : public Unary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
     void SetTextureID(int i);
     int GetTextureID() const;
+
   protected:
     int textureID = 0;
 };
 class Ceiling : public Unary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Floor : public Unary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Round : public Unary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Negate : public Unary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Absolute : public Unary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class X : public Unary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Y : public Unary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Z : public Unary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Screen : public Unary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Random : public Unary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Noise : public Unary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 
 ////Binary
 class Binary : public Toy {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Multiply : public Binary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Divide : public Binary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Add : public Binary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Subtract : public Binary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Modulus : public Binary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Dot : public Binary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Cross : public Binary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Distance : public Binary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Direction : public Binary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 
 class Step : public Binary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class NGon : public Binary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Circle : public Binary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 
 ////Trinary
 class Trinary : public Toy {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Combine : public Trinary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Clamp : public Trinary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Mix : public Trinary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class SmoothStep : public Trinary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class Line : public Trinary {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 class LineSegment : public Line {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
 
 //// n-ary
 class Average : public Toy {
   public:
-    std::string Name();
-    std::string GenerateGLSL();
+    BASE;
 };
