@@ -9,7 +9,8 @@ class Toy {
     virtual std::string Name();
     virtual std::string GenerateGLSL();
     void AddChild(std::shared_ptr<Toy> toy);
-    void RemoveChild(std::shared_ptr<Toy> toy);
+    void AddChild(std::shared_ptr<Toy> toy, int position);
+    int RemoveChild(std::shared_ptr<Toy> toy);
     std::shared_ptr<Toy> GetChild(int n) const;
     virtual std::shared_ptr<Toy> Clone();
     int NumChildren() const;

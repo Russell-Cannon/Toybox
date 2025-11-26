@@ -1,5 +1,5 @@
-n = 20
-x = smoothstep(0.45, 0.55,linesegment(fract(uv*n), combine(.25, 0.25, 0), combine(.75, .75, 0)))
-     *smoothstep(0.45, 0.55,linesegment(fract(uv*n), combine(.25, 0.75, 0), combine(.75, .25, 0)))
+numberOfStitches = 20
+stitch(y1, y2) = smoothstep(0.45, 0.55, linesegment(fract(uv*numberOfStitches), combine(.25, y1, 0), combine(.75, y2, 0)))
+crossPattern = stitch(.25, .75) * stitch(.75, .25)
 
-(texture(floor(uv*n)/n)*(1 - x)) + x
+(texture(floor(uv * numberOfStitches) / numberOfStitches) * (1 - crossPattern)) + crossPattern

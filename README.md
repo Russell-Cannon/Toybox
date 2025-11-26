@@ -125,13 +125,13 @@ XYZ, RGB, and UVW can be used interchangeably.
   - [ ] CRT Filter
   - [ ] Roald Dahl
   - [ ] Mandelbrot set ?
-- [ ] Function support
+- [x] Function support
   - [ ] Allow references to other toybox files to be used as a sort of `val` toy. ?
 - [x] Comment support
 - [ ] Some way to communicate parameter names
   - Potentially in AST print-out?
 - [x] External textures
-- [ ] Some way to record or screenshot the page in browser ?
+  - [ ] Some way to record or screenshot the page in browser ?
 
 ## Credit
 

@@ -17,14 +17,16 @@ Toy::Toy() {}
 std::string Toy::Name() { return "Abstract Toy"; }
 std::string Toy::GenerateGLSL() { return ""; }
 void Toy::AddChild(std::shared_ptr<Toy> toy) { children.push_back(toy); }
-void Toy::RemoveChild(std::shared_ptr<Toy> toy) {
+void Toy::AddChild(std::shared_ptr<Toy> toy, int position) { children.insert(children.begin() + position, toy); }
+int Toy::RemoveChild(std::shared_ptr<Toy> toy) {
     for (int i = 0; i < NumChildren(); i++) {
         if (toy.get() == GetChild(i).get()) {
             children.erase(children.begin() + i);
-            return;
+            return i;
         }
     }
     std::cerr << "Could not remove toy from children of " << Name() << '\n';
+    return -1;
 }
 std::shared_ptr<Toy> Toy::GetChild(int n) const { return children[n]; }
 CLONE(Toy)
@@ -100,7 +102,10 @@ CLONE(Document)
 
 Parameter::Parameter(std::string _ID) { ID = _ID; }
 std::string Parameter::Name() { return "Parameter (" + ID + ")"; }
-std::string Parameter::GenerateGLSL() { return ""; }
+std::string Parameter::GenerateGLSL() {
+    std::cerr << "Parameter Toy used to generate shape!\n";
+    return "";
+}
 std::shared_ptr<Toy> Parameter::Clone() {
     std::shared_ptr<Toy> clone = std::shared_ptr<Toy>(new Parameter(ID));
     for (int i = 0; i < children.size(); i++) {

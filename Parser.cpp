@@ -225,13 +225,12 @@ bool Parser::parseFunction(std::string& str, std::string id, std::shared_ptr<Toy
 void Parser::DFSAndReplace(std::shared_ptr<Toy> head, std::shared_ptr<Toy> last, const std::vector<std::string>& find, const std::vector<std::shared_ptr<Toy>>& replace) {
     // if head is in find
     if (typeid(*head.get()) == typeid(Parameter)) {
-        std::cout << head->Name() << " is a parameter shape\n";
         Parameter* param = (Parameter*)head.get();
         for (int i = 0; i < find.size(); i++) {
             if (param->ID == find[i]) {
-                last->RemoveChild(head);
+                int pos = last->RemoveChild(head);
                 // make last point to replace
-                last->AddChild(replace[i]);
+                last->AddChild(replace[i], pos);
                 return;
             }
         }
