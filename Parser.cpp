@@ -24,10 +24,6 @@ bool Parser::semanticError(std::string message) {
     return false;
 }
 
-const std::map<std::string, std::string>& Parser::GetTextures() const {
-    return symbolTable.GetTexturesTable();
-}
-
 void Parser::Parse(std::string str) {
     Lexer lex;
     std::string temp = str;
@@ -75,7 +71,7 @@ bool Parser::parseAssignment(std::string& str) {
 
     Token operand = lex.GetNext(str, lineCount);
     if (operand.type == FILEPATH) {
-        symbolTable.Insert(id.value, operand.value);
+        SymbolTable.Insert(id.value, operand.value);
         return true;
     }
     // Undo stealing that operand
@@ -84,7 +80,7 @@ bool Parser::parseAssignment(std::string& str) {
     if (parseStatement(str, holder)) {
         if (holder->NumChildren() == 0)
             std::cerr << "Parsed empty statement!";
-        symbolTable.Insert(id.value, holder->GetChild(0));
+        SymbolTable.Insert(id.value, holder->GetChild(0));
         return true;
     }
 
@@ -113,7 +109,7 @@ bool Parser::parseFunctionDeclaration(std::string& str, std::string id) {
 
     // push our parameters to the symbol table
     for (int i = 0; i < function.parameters.size(); i++) {
-        symbolTable.Insert(function.parameters[i], std::shared_ptr<Toy>(new Parameter(function.parameters[i])));
+        SymbolTable.Insert(function.parameters[i], std::shared_ptr<Toy>(new Parameter(function.parameters[i])));
     }
 
     // read the expression
@@ -123,12 +119,12 @@ bool Parser::parseFunctionDeclaration(std::string& str, std::string id) {
 
     // remove our parameters
     for (int i = 0; i < function.parameters.size(); i++) {
-        symbolTable.Remove(function.parameters[i]);
+        SymbolTable.Remove(function.parameters[i]);
     }
 
     // push the expression to the function table under our id
     function.AST = holder->GetChild(0);
-    symbolTable.Insert(id, function);
+    SymbolTable.Insert(id, function);
 
     return true;
 }
@@ -195,7 +191,7 @@ bool Parser::parseExpandingSizeOperation(std::string& str, std::shared_ptr<Toy> 
 bool Parser::parseFunction(std::string& str, std::string id, std::shared_ptr<Toy> toy) {
     Lexer lex;
     std::vector<std::shared_ptr<Toy>> arguments;
-    Function fun = symbolTable.GetFunction(id);
+    Function fun = SymbolTable.GetFunction(id);
     // get arguments
     if (lex.GetNext(str, lineCount).type != OPEN_PARENTHESIS)
         return false;
@@ -316,17 +312,17 @@ bool Parser::parseToy(std::string& str, std::shared_ptr<Toy> toy) {
         } else if (next.value == "average") {
             return parseExpandingSizeOperation<Average>(str, toy);
 
-        } else if (symbolTable.Exists(next.value)) { // id exists as key in symbol table
-            if (symbolTable.IsTexture(next.value)) {
+        } else if (SymbolTable.Exists(next.value)) { // id exists as key in symbol table
+            if (SymbolTable.IsTexture(next.value)) {
                 if (!parseUnaryOperation<Texture>(str, toy))
                     return false;
                 Texture* text = (Texture*)toy->GetChild(0).get(); // get the texture we just added.
                 text->SetTexture(next.value);                     // set the texture id
                 return true;
-            } else if (symbolTable.IsConstant(next.value)) {
-                toy->AddChild(symbolTable.GetConstant(next.value)); // add constant variable
+            } else if (SymbolTable.IsConstant(next.value)) {
+                toy->AddChild(SymbolTable.GetConstant(next.value)); // add constant variable
                 return true;
-            } else if (symbolTable.IsFunction(next.value)) { // key represents a function
+            } else if (SymbolTable.IsFunction(next.value)) { // key represents a function
                 return parseFunction(str, next.value, toy);
             }
         } else {
@@ -412,7 +408,7 @@ bool Parser::parseMathematicalOperator(std::string& str, std::shared_ptr<Toy> to
 }
 
 void Parser::PrintSymbolTable() {
-    symbolTable.Print();
+    SymbolTable.Print();
 }
 
 void Parser::PrintAST() {

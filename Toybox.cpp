@@ -40,18 +40,18 @@ int main(int argc, char* argv[]) {
             if (command == "output$") {
                 fout << parser.GenerateGLSL();
             } else if (command == "texture$") {
-                for (std::pair<std::string, std::string> t : parser.GetTextures()) {
-                    fout << "createTexture(\"" << t.second << "\");\n";
+                for (std::string p : parser.SymbolTable.GetTexturePaths()) {
+                    fout << "createTexture(\"" << p << "\");\n";
                 }
             } else if (command == "uniformtextures$") {
-                for (std::pair<std::string, std::string> t : parser.GetTextures()) {
-                    fout << "uniform sampler2D u_texture_" << t.first << ";\n";
+                for (std::string n : parser.SymbolTable.GetTextureNames()) {
+                    fout << "uniform sampler2D u_texture_" << n << ";\n";
                 }
             } else if (command == "bindtextures$") {
                 int i = 0;
-                for (std::pair<std::string, std::string> t : parser.GetTextures()) {
-                    fout << "let iTextureLoc" << t.first << " = gl.getUniformLocation(prog, \"u_texture_" << t.first << "\");\n";
-                    fout << "gl.uniform1i(iTextureLoc" << t.first << ", " << i << ");\n";
+                for (std::string n : parser.SymbolTable.GetTextureNames()) {
+                    fout << "let iTextureLoc" << n << " = gl.getUniformLocation(prog, \"u_texture_" << n << "\");\n";
+                    fout << "gl.uniform1i(iTextureLoc" << n << ", " << i << ");\n";
                     i++;
                 }
             }

@@ -11,7 +11,6 @@
 
 class Parser {
     std::shared_ptr<Toy> document;
-    SymbolTable symbolTable;
     std::string filename = "";
     int lineCount = 1;
 
@@ -39,12 +38,13 @@ class Parser {
     bool parseMathematicalOperator(std::string& str, std::shared_ptr<Toy> toy, std::shared_ptr<Toy> first);
 
   public:
+    SymbolTable SymbolTable;
+
     Parser();
     Parser(std::string _filename);
 
     void Parse(std::string str);
     std::string GenerateGLSL();
-    const std::map<std::string, std::string>& GetTextures() const;
 
     void PrintAST();
     void PrintSymbolTable();

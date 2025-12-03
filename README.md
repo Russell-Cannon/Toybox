@@ -108,6 +108,7 @@ XYZ, RGB, and UVW can be used interchangeably.
 ## To Do
 
 - [x] Basic Arithmetic symbols
+  - [ ] Negate
   - [ ] Order of operations
   - [ ] |Abs| bars
 - [x] Swizzling
