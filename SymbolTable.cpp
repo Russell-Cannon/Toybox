@@ -60,13 +60,13 @@ void SymbolTable::Remove(std::string key) {
 std::vector<std::string> SymbolTable::GetTextureNames() {
     std::vector<std::string> names;
     for (auto i : textureTable)
-        names.push_back(i.first);
+        names.insert(names.begin(), i.first);
     return names;
 }
 std::vector<std::string> SymbolTable::GetTexturePaths() {
     std::vector<std::string> paths;
     for (auto i : textureTable)
-        paths.push_back(i.second);
+        paths.insert(paths.begin(), i.second);
     return paths;
 }
 

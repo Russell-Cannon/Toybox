@@ -47,5 +47,4 @@ class Parser {
     std::string GenerateGLSL();
 
     void PrintAST();
-    void PrintSymbolTable();
 };

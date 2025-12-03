@@ -1,4 +1,5 @@
 #include "Parser.h"
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -8,8 +9,19 @@ int main(int argc, char* argv[]) {
     std::ifstream fin;
     std::string filename;
 
+    bool printAST = false;
+    bool printST = false;
+
     if (argc > 1) {
         filename = argv[1];
+        if (argc > 2) {
+            for (int i = 2; i < argc; i++) {
+                if (strcmp(argv[i], "-printast") == 0 || strcmp(argv[i], "-ast") == 0)
+                    printAST = true;
+                if (strcmp(argv[i], "-printst") == 0 || strcmp(argv[i], "-st") == 0)
+                    printST = true;
+            }
+        }
     } else {
         std::cout << "Enter file name: ";
         std::cin >> filename;
@@ -22,8 +34,10 @@ int main(int argc, char* argv[]) {
     Parser parser(filename);
 
     parser.Parse(buffer.str());
-    parser.PrintSymbolTable();
-    parser.PrintAST();
+    if (printST)
+        parser.SymbolTable.Print();
+    if (printAST)
+        parser.PrintAST();
 
     std::ifstream scaffold("in.html");
     std::ofstream fout("out.html");

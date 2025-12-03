@@ -407,10 +407,6 @@ bool Parser::parseMathematicalOperator(std::string& str, std::shared_ptr<Toy> to
     return true;
 }
 
-void Parser::PrintSymbolTable() {
-    SymbolTable.Print();
-}
-
 void Parser::PrintAST() {
     std::cout << document->Name() << ":\n";
     if (!document->Empty())
